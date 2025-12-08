@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HugoBOT - Asistente Virtual</title>
+    <title>HugoBOT - Tu Asistente Virtual</title>
     <style>
+        /* (TU CSS ORIGINAL SE MANTIENE AQUÍ) */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -23,7 +24,7 @@
             max-width: 450px;
             height: 90vh;
             max-height: 700px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9); /* Opacidad mejorada */
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -31,8 +32,8 @@
         }
 
         #header-content {
-            background-color: #007bff;
-            color: white; /* Color corregido para que el texto sea visible */
+            background-color: #004d99; /* Azul marino */
+            color: white;
             padding: 15px;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
@@ -41,9 +42,9 @@
         }
         
         #header-content img {
-            width: 80px; /* Tamaño un poco más pequeño para la imagen */
+            width: 80px;
             height: 80px;
-            border-radius: 50%; /* Para hacerla circular */
+            border-radius: 50%;
             object-fit: cover;
             margin-bottom: 10px;
         }
@@ -66,7 +67,8 @@
 <body>
     <div id="chat-container">
 
-        <div id="header-content"> <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1759943005/202510080950_portada_r85ywo.jpg" alt="Hugobot">
+        <div id="header-content">
+            <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1759943005/202510080950_portada_r85ywo.jpg" alt="Hugobot">
             <div>HugoBOT - Tu Asistente Virtual</div>
         </div>
 
@@ -80,44 +82,50 @@
     </div>
 
     <script>
-        // ⚠️ DEBES REEMPLAZAR ESTA URL con la URL de despliegue de tu Web App de Apps Script
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeK9B9uryoeOk6Sq8j1_q_RrKyPpnqOIPP-IXsW-LGJQt3csflazm3sfXnu4SSugaslA/exec"; 
+        // ⚠️ CRÍTICO: REEMPLAZA ESTA URL con la URL de tu Web App de Apps Script (la que termina en /exec)
+        const WEB_APP_URL = "https://script.google.com/macros/s/PEGAR_AQUÍ_TU_URL_DE_DESPLIEGUE/exec"; 
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Mensaje inicial de bienvenida, ya que no podemos llamar a getInitialData desde GitHub
-            addMessage('Bot', '¡Hola! Soy HugoBOT. Estoy aquí para ayudarte con la Investigación de Mercado. ¿Qué tema quieres revisar primero?');
-            updateOptions(['Mercado, Nicho y Subnicho', 'Creación del Avatar', 'La Big Idea y la Promesa']);
+            // El bot debe iniciar la conversación de forma asíncrona (usando fetch)
+            // Aquí se llama a la función getInitialData, pero simulando el proceso de Apps Script.
+            // Para simplificar, usamos el mensaje estático de bienvenida de tu hoja FAQs (ID: welcome)
+            
+            // Este es el mensaje inicial de tu hoja FAQs
+            addMessage('Bot', '¡Hola! Bienvenido a tu asistente personal!! ... Cuéntame, ¿En qué puedo ayudarte?');
+            updateOptions([
+                'Quiero conocer los cursos disponibles', 
+                'Página Web', 
+                'Consultorías', 
+                'Cursos Grupales de Productividad', 
+                'Servicios Empaquetados de pago mensual'
+            ]);
         });
 
-        // ----------------------------------------------------
-        // FUNCIONES ADAPTADAS PARA USAR FETCH (INTERNET ESTÁNDAR)
-        // ----------------------------------------------------
-
-        // La función handleBotResponse fue eliminada ya que la lógica de respuesta se integra en sendMessage
-        
         function handleOptionClick(optionText) {
-            sendMessage(optionText);
+            sendMessage(optionText); // Redirige el clic a la función de envío
         }
-        
+
+        // --- FUNCIÓN CLAVE MODIFICADA PARA USAR FETCH ---
         function sendMessage(messageContent = null) {
             const input = document.getElementById('input');
-            const message = messageContent || input.value.trim(); // Usa el contenido del botón o el input
+            const message = messageContent || input.value.trim();
 
             if (!message) return;
 
             addMessage('Tú', message);
-            if (!messageContent) input.value = ''; // Limpiar el input solo si viene del campo de texto
+            if (!messageContent) input.value = '';
             
             showLoading();
-            updateOptions([]); // Limpiar opciones
+            updateOptions([]);
 
+            // Datos que se enviarán a la función doPost en Apps Script
             const requestData = new URLSearchParams({
                 'message': message
             });
 
-            // Usamos FETCH para comunicarnos con Apps Script
+            // Reemplaza google.script.run por FETCH
             fetch(WEB_APP_URL, {
-                method: 'POST',
+                method: 'POST', // Usamos POST para enviar datos
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
@@ -126,33 +134,32 @@
             .then(response => response.text())
             .then(responseText => {
                 hideLoading();
-                // Asumiendo que Apps Script devuelve una respuesta compleja en formato JSON
                 try {
+                    // Esperamos una respuesta JSON desde doPost
                     const response = JSON.parse(responseText);
                     addMessage('Bot', response.content, response.url);
                     updateOptions(response.options);
                 } catch (e) {
-                    // Si Apps Script devuelve solo texto plano (no JSON)
-                    addMessage('Bot', responseText, null);
+                    // Manejo de errores si la respuesta no es un JSON válido
+                    addMessage('Bot', 'Error al procesar la respuesta del servidor (Apps Script).', null);
+                    console.error("Error al parsear JSON:", responseText, e);
                     updateOptions([]);
                 }
             })
             .catch(error => {
                 hideLoading();
-                console.error('Error de comunicación con Apps Script:', error);
-                addMessage('Bot', '⚠️ Lo siento, hubo un error de comunicación con el servidor.', null);
+                console.error('Error de comunicación con Apps Script (FETCH):', error);
+                addMessage('Bot', '⚠️ Error de conexión. Verifica la URL de la Web App.', null);
+                updateOptions([]);
             });
         }
+        // --- FIN DE LA FUNCIÓN CLAVE ---
 
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         }
-
-        // ----------------------------------------------------
-        // FUNCIONES AUXILIARES (SE MANTIENEN CASI IGUAL)
-        // ----------------------------------------------------
 
         function addMessage(sender, text, url) {
             const messagesDiv = document.getElementById('messages');
@@ -190,7 +197,7 @@
         }
         
         function hideLoading() {
-            // La función updateOptions se encarga de limpiar el "Escribiendo..."
+            // Se limpia al actualizar las opciones
         }
     </script>
 </body>
