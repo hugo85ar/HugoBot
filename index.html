@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <base target="_top"> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HugoBOT - Tu Asistente Virtual</title>
     <style>
-        /* (TU CSS ORIGINAL SE MANTIENE AQUÍ) */
+        /* (TU CSS COMPLETO AQUÍ) */
+        /* ... (Dejo el CSS por brevedad, pero debe estar completo) ... */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -24,7 +26,7 @@
             max-width: 450px;
             height: 90vh;
             max-height: 700px;
-            background: rgba(255, 255, 255, 0.9); /* Opacidad mejorada */
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -32,7 +34,7 @@
         }
 
         #header-content {
-            background-color: #004d99; /* Azul marino */
+            background-color: #004d99;
             color: white;
             padding: 15px;
             border-top-left-radius: 10px;
@@ -76,92 +78,107 @@
         <div id="options-container"></div>
         <div id="input-area">
             <input id="input" type="text" placeholder="O escribe tu pregunta..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">›</button>
+            <button onclick="sendMessage(null, true)">›</button>
         </div>
 
     </div>
 
     <script>
-        // ⚠️ CRÍTICO: REEMPLAZA ESTA URL con la URL de tu Web App de Apps Script (la que termina en /exec)
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeK9B9uryoeOk6Sq8j1_q_RrKyPpnqOIPP-IXsW-LGJQt3csflazm3sfXnu4SSugaslA/exec"; 
+        // CRÍTICO: La URL para el acceso externo (usada solo cuando NO es Apps Script)
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeK9B9uryoeOk6Sq8j1_q_RrKyPpnqOIPP-IXsW-LGJQt3csflazm3sfXnu4SSugaslA/exec";
 
+        // Función de inicialización: Determina qué método de comunicación usar
         document.addEventListener('DOMContentLoaded', function() {
-            // El bot debe iniciar la conversación de forma asíncrona (usando fetch)
-            // Aquí se llama a la función getInitialData, pero simulando el proceso de Apps Script.
-            // Para simplificar, usamos el mensaje estático de bienvenida de tu hoja FAQs (ID: welcome)
-            
-            // Este es el mensaje inicial de tu hoja FAQs
-            addMessage('Bot', '¡Hola! Bienvenido a tu asistente personal!! ... Cuéntame, ¿En qué puedo ayudarte?');
-            updateOptions([
-                'Quiero conocer los cursos disponibles', 
-                'Página Web', 
-                'Consultorías', 
-                'Cursos Grupales de Productividad', 
-                'Servicios Empaquetados de pago mensual'
-            ]);
+            showLoading();
+            // Si la función google.script.run existe, estamos en el entorno de Apps Script
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                // Modo Apps Script: Comunicación interna
+                google.script.run.withSuccessHandler(handleBotResponse).getInitialData();
+            } else {
+                // Modo GitHub/Externo: Usa el mensaje estático (ya que getInitialData no es POST)
+                handleBotResponse({
+                    content: '¡Hola! Bienvenido a tu asistente personal!! ... Cuéntame, ¿En qué puedo ayudarte?',
+                    options: [
+                        'Quiero conocer los cursos disponibles', 
+                        'Página Web', 
+                        'Consultorías', 
+                        'Cursos Grupales de Productividad', 
+                        'Servicios Empaquetados de pago mensual'
+                    ]
+                });
+            }
         });
 
-        function handleOptionClick(optionText) {
-            sendMessage(optionText); // Redirige el clic a la función de envío
+        function handleBotResponse(response) {
+            hideLoading();
+            addMessage('Bot', response.content, response.url);
+            updateOptions(response.options);
         }
 
-        // --- FUNCIÓN CLAVE MODIFICADA PARA USAR FETCH ---
-        function sendMessage(messageContent = null) {
+        function handleOptionClick(optionText) {
+            sendMessage(optionText, false); // Mantiene el clic como no-input
+        }
+        
+        // --- FUNCIÓN UNIFICADA: Maneja google.script.run (interno) o fetch (externo) ---
+        function sendMessage(messageContent = null, isInput = false) {
             const input = document.getElementById('input');
             const message = messageContent || input.value.trim();
 
             if (!message) return;
 
             addMessage('Tú', message);
-            if (!messageContent) input.value = '';
+            if (isInput) input.value = ''; // Limpiar solo si viene del campo de texto
             
             showLoading();
             updateOptions([]);
 
-            // Datos que se enviarán a la función doPost en Apps Script
-            const requestData = new URLSearchParams({
-                'message': message
-            });
+            // 1. DETERMINAR EL MODO DE COMUNICACIÓN
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                // MODO A: APPS SCRIPT (INTERNO)
+                google.script.run.withSuccessHandler(handleBotResponse).getBotResponse(message);
+            } else {
+                // MODO B: GITHUB / EXTERNO (FETCH)
+                const requestData = new URLSearchParams({
+                    'message': message
+                });
 
-           // Reemplaza google.script.run por FETCH
-            fetch(WEB_APP_URL, {
-                method: 'POST', // Usamos POST para enviar datos
-                mode: 'no-cors', // <--- AÑADE ESTA LÍNEA
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: requestData 
-            })
-            .then(response => response.text())
-            .then(responseText => {
-                hideLoading();
-                try {
-                    // Esperamos una respuesta JSON desde doPost
-                    const response = JSON.parse(responseText);
-                    addMessage('Bot', response.content, response.url);
-                    updateOptions(response.options);
-                } catch (e) {
-                    // Manejo de errores si la respuesta no es un JSON válido
-                    addMessage('Bot', 'Error al procesar la respuesta del servidor (Apps Script).', null);
-                    console.error("Error al parsear JSON:", responseText, e);
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: requestData 
+                })
+                .then(response => response.text())
+                .then(responseText => {
+                    hideLoading();
+                    try {
+                        const response = JSON.parse(responseText);
+                        handleBotResponse(response);
+                    } catch (e) {
+                        addMessage('Bot', 'Error al procesar la respuesta del servidor (Apps Script).', null);
+                        console.error("Error al parsear JSON:", responseText, e);
+                        updateOptions([]);
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error de comunicación con Apps Script (FETCH):', error);
+                    addMessage('Bot', '⚠️ Error de conexión. Verifica la URL de la Web App.', null);
                     updateOptions([]);
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error de comunicación con Apps Script (FETCH):', error);
-                addMessage('Bot', '⚠️ Error de conexión. Verifica la URL de la Web App.', null);
-                updateOptions([]);
-            });
+                });
+            }
         }
-        // --- FIN DE LA FUNCIÓN CLAVE ---
+        // --- FIN DE LA FUNCIÓN UNIFICADA ---
 
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
-                sendMessage();
+                sendMessage(null, true);
             }
         }
 
+        // --- FUNCIONES AUXILIARES (iguales) ---
         function addMessage(sender, text, url) {
             const messagesDiv = document.getElementById('messages');
             const messageClass = sender === 'Tú' ? 'user-message' : 'bot-message';
@@ -197,9 +214,7 @@
             optionsContainer.innerHTML = '<p style="color:#999; font-size:0.9em;">Escribiendo...</p>';
         }
         
-        function hideLoading() {
-            // Se limpia al actualizar las opciones
-        }
+        function hideLoading() {}
     </script>
 </body>
 </html>
