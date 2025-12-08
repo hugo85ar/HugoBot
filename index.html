@@ -123,9 +123,10 @@
                 'message': message
             });
 
-            // Reemplaza google.script.run por FETCH
+           // Reemplaza google.script.run por FETCH
             fetch(WEB_APP_URL, {
                 method: 'POST', // Usamos POST para enviar datos
+                mode: 'no-cors', // <--- AÑADE ESTA LÍNEA
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
