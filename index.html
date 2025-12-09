@@ -83,138 +83,126 @@
 
     </div>
 
-    <script>
-        // CRÍTICO: La URL para el acceso externo (usada solo cuando NO es Apps Script)
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeK9B9uryoeOk6Sq8j1_q_RrKyPpnqOIPP-IXsW-LGJQt3csflazm3sfXnu4SSugaslA/exec";
+ <script>
+    // CRÍTICO: La URL para el acceso externo (usada solo cuando NO es Apps Script)
+    // 🚨 ATENCIÓN: Reemplaza ESTA URL con la nueva URL /exec que obtuviste en el paso anterior (sin ?callback=...)
+    const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxeK9B9uryoeOk6Sq8j1_q_RrKyPpnqOIPP-IXsW-LGJQt3csflazm3sfXnu4SSugaslA/exec";
+    
+    // Función global de callback que Apps Script llamará para devolver la respuesta
+    window.handleServerResponse = function(response) {
+        // Esta función recibirá la respuesta JSON del bot (ya parseada por JSONP)
+        handleBotResponse(response);
+    };
 
-        // Función de inicialización: Determina qué método de comunicación usar
-        document.addEventListener('DOMContentLoaded', function() {
-            showLoading();
-            // Si la función google.script.run existe, estamos en el entorno de Apps Script
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                // Modo Apps Script: Comunicación interna
-                google.script.run.withSuccessHandler(handleBotResponse).getInitialData();
-            } else {
-                // Modo GitHub/Externo: Usa el mensaje estático (ya que getInitialData no es POST)
-                handleBotResponse({
-                    content: '¡Hola! Bienvenido a tu asistente personal!! ... Cuéntame, ¿En qué puedo ayudarte?',
-                    options: [
-                        'Quiero conocer los cursos disponibles', 
-                        'Página Web', 
-                        'Consultorías', 
-                        'Cursos Grupales de Productividad', 
-                        'Servicios Empaquetados de pago mensual'
-                    ]
-                });
-            }
-        });
+    function handleBotResponse(response) {
+        hideLoading();
+        // El bot ya no tiene el mensaje estático si la llamada falló, así que esto siempre es la respuesta del bot
+        addMessage('Bot', response.content, response.url);
+        updateOptions(response.options);
+    }
 
-        function handleBotResponse(response) {
-            hideLoading();
-            addMessage('Bot', response.content, response.url);
-            updateOptions(response.options);
+    function handleOptionClick(optionText) {
+        sendMessage(optionText, false); 
+    }
+    
+    // Función de inicialización: Determina qué método de comunicación usar
+    document.addEventListener('DOMContentLoaded', function() {
+        showLoading();
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            // Modo Apps Script: Comunicación interna
+            google.script.run.withSuccessHandler(handleBotResponse).getInitialData();
+        } else {
+            // MODO B: GITHUB / EXTERNO - JSONP para la carga inicial
+            const initialUrl = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse`;
+            const script = document.createElement('script');
+            script.src = initialUrl;
+            document.head.appendChild(script);
+            // El onload lo manejamos dentro de handleServerResponse al recibir la primera respuesta.
         }
+    });
 
-        function handleOptionClick(optionText) {
-            sendMessage(optionText, false); // Mantiene el clic como no-input
-        }
+    // --- FUNCIÓN UNIFICADA: Maneja google.script.run (interno) o JSONP (externo) ---
+    function sendMessage(messageContent = null, isInput = false) {
+        const input = document.getElementById('input');
+        const message = messageContent || input.value.trim();
+
+        if (!message) return;
+
+        addMessage('Tú', message);
+        if (isInput) input.value = ''; 
         
-        // --- FUNCIÓN UNIFICADA: Maneja google.script.run (interno) o fetch (externo) ---
-        function sendMessage(messageContent = null, isInput = false) {
-            const input = document.getElementById('input');
-            const message = messageContent || input.value.trim();
+        showLoading();
+        updateOptions([]);
 
-            if (!message) return;
-
-            addMessage('Tú', message);
-            if (isInput) input.value = ''; // Limpiar solo si viene del campo de texto
+        // 1. DETERMINAR EL MODO DE COMUNICACIÓN
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            // MODO A: APPS SCRIPT (INTERNO)
+            google.script.run.withSuccessHandler(handleBotResponse).getBotResponse(message);
+        } else {
+            // MODO B: GITHUB / EXTERNO (JSONP GET para el mensaje)
+            const encodedMessage = encodeURIComponent(message);
+            // Usamos '&' porque el '?' ya está en la URL base si fue llamado con initial=true
+            const chatUrl = `${WEB_APP_URL_BASE}?message=${encodedMessage}&callback=handleServerResponse`; 
             
-            showLoading();
-            updateOptions([]);
-
-            // 1. DETERMINAR EL MODO DE COMUNICACIÓN
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                // MODO A: APPS SCRIPT (INTERNO)
-                google.script.run.withSuccessHandler(handleBotResponse).getBotResponse(message);
-            } else {
-                // MODO B: GITHUB / EXTERNO (FETCH)
-                const requestData = new URLSearchParams({
-                    'message': message
-                });
-
-                fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', 
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: requestData 
-                })
-                .then(response => response.text())
-                .then(responseText => {
-                    hideLoading();
-                    try {
-                        const response = JSON.parse(responseText);
-                        handleBotResponse(response);
-                    } catch (e) {
-                        addMessage('Bot', 'Error al procesar la respuesta del servidor (Apps Script).', null);
-                        console.error("Error al parsear JSON:", responseText, e);
-                        updateOptions([]);
-                    }
-                })
-                .catch(error => {
-                    hideLoading();
-                    console.error('Error de comunicación con Apps Script (FETCH):', error);
-                    addMessage('Bot', '⚠️ Error de conexión. Verifica la URL de la Web App.', null);
-                    updateOptions([]);
-                });
-            }
+            const script = document.createElement('script');
+            script.src = chatUrl;
+            document.head.appendChild(script);
+            script.onload = () => { 
+                // Limpiamos el script tag después de su uso.
+                script.remove(); 
+            }; 
         }
-        // --- FIN DE LA FUNCIÓN UNIFICADA ---
+    }
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage(null, true);
-            }
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage(null, true);
         }
+    }
 
-        // --- FUNCIONES AUXILIARES (iguales) ---
-        function addMessage(sender, text, url) {
-            const messagesDiv = document.getElementById('messages');
-            const messageClass = sender === 'Tú' ? 'user-message' : 'bot-message';
-            
-            let messageHTML = `<div class="message ${messageClass}">`;
-            messageHTML += `<div class="sender">${sender}</div>`;
-            messageHTML += `<div class="text">${text}`;
-            if (url) {
-                messageHTML += `<br><br><a href="${url}" target="_blank">Accede aquí</a>`;
-            }
-            messageHTML += `</div></div>`;
-            
-            messagesDiv.innerHTML += messageHTML;
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function updateOptions(options) {
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '';
-            if (options && options.length > 0) {
-                options.forEach(option => {
-                    const button = document.createElement('button');
-                    button.className = 'option-button';
-                    button.textContent = option;
-                    button.onclick = function() { handleOptionClick(option); };
-                    optionsContainer.appendChild(button);
-                });
-            }
-        }
-
-        function showLoading() {
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '<p style="color:#999; font-size:0.9em;">Escribiendo...</p>';
-        }
+    // --- FUNCIONES AUXILIARES (las mantengo iguales) ---
+    function addMessage(sender, text, url) {
+        const messagesDiv = document.getElementById('messages');
+        const messageClass = sender === 'Tú' ? 'user-message' : 'bot-message';
         
-        function hideLoading() {}
-    </script>
+        let messageHTML = `<div class="message ${messageClass}">`;
+        messageHTML += `<div class="sender">${sender}</div>`;
+        messageHTML += `<div class="text">${text}`;
+        if (url) {
+            messageHTML += `<br><br><a href="${url}" target="_blank">Accede aquí</a>`;
+        }
+        messageHTML += `</div></div>`;
+        
+        messagesDiv.innerHTML += messageHTML;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function updateOptions(options) {
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        if (options && options.length > 0) {
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = function() { handleOptionClick(option); };
+                optionsContainer.appendChild(button);
+            });
+        }
+    }
+
+    function showLoading() {
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '<p style="color:#999; font-size:0.9em;">Escribiendo...</p>';
+    }
+    
+    function hideLoading() {
+        const optionsContainer = document.getElementById('options-container');
+        // Quita el mensaje "Escribiendo..." pero mantiene el contenedor vacío si no hay opciones nuevas.
+        if (optionsContainer.innerHTML.includes('Escribiendo')) {
+             optionsContainer.innerHTML = '';
+        }
+    }
+</script>
 </body>
 </html>
