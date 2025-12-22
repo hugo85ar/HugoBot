@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HugoBOT</title>
+    <title>HugoBOT - Tu Asistente Virtual</title>
     <style>
-        /* 1. BLOQUEO DE FONDO */
+        /* 1. RESET Y FONDO PARA NOTEBOOK */
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             overflow: hidden; position: fixed; 
-            background-color: #1a0b2e;
-            background-image: url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1759946006/Designer_34_s2x34f.jpg');
-            background-size: cover; background-position: center;
+            background: #1a0b2e url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1759946006/Designer_34_s2x34f.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: sans-serif;
         }
 
-        /* 2. CONTENEDOR (Pantalla completa en móvil, centrado en PC) */
+        /* 2. CONTENEDOR: Pantalla completa en móvil, tamaño ideal en Notebook */
         #chat-container {
             display: flex; flex-direction: column;
             background: #ffffff; position: fixed;
@@ -25,55 +25,59 @@
 
         @media (min-width: 601px) {
             #chat-container {
-                width: 420px; height: 85vh; max-height: 750px;
+                width: 500px; /* Un poco más ancho para que no sea "super chico" */
+                height: 85vh; max-height: 800px;
                 top: 50%; left: 50%; transform: translate(-50%, -50%);
-                border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.6);
             }
         }
 
-        /* 3. CABECERA - EL FIX PARA EL ROBOT GIGANTE */
+        /* 3. CABECERA: FIX DEFINITIVO PARA EL ROBOT GIGANTE */
         #header-content {
             background-color: #004d99; color: white;
-            padding: 10px; text-align: center; flex-shrink: 0;
+            padding: 12px; text-align: center; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* FORZAMOS EL TAMAÑO AQUÍ CON !IMPORTANT */
+        /* Forzamos el tamaño con max-width y max-height además de width */
         #header-content img {
-            width: 60px !important; height: 60px !important;
+            width: 70px !important; height: 70px !important;
+            max-width: 70px !important; max-height: 70px !important;
             border-radius: 50%; object-fit: cover;
-            border: 2px solid white; display: block;
-            margin: 0 auto 5px;
+            border: 3px solid white; display: block; margin-bottom: 5px;
         }
 
-        #header-content div { font-weight: bold; font-size: 0.9em; }
+        #header-content div { font-weight: bold; font-size: 1.1em; }
 
         /* 4. MENSAJES */
         #messages { flex: 1; overflow-y: auto; padding: 15px; background: white; }
-        .message { margin-bottom: 15px; display: flex; flex-direction: column; font-family: sans-serif; }
-        .text { padding: 10px 15px; border-radius: 15px; max-width: 85%; font-size: 0.9em; line-height: 1.4; }
-        .bot-message .text { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .user-message .text { background: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .message { margin-bottom: 15px; display: flex; flex-direction: column; }
+        .text { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 0.95em; line-height: 1.5; }
+        .bot-message .text { background: #f1f0f2; align-self: flex-start; border-bottom-left-radius: 4px; color: #333; }
+        .user-message .text { background: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
 
-        /* FIX IMÁGENES DE LOS PACKS */
+        /* FIX PARA LAS IMÁGENES DE LOS PACKS (INVESTIGACIÓN/EMPRENDEDOR) */
         .bot-image-preview { 
-            width: 100% !important; max-width: 280px !important; 
-            height: auto !important; border-radius: 8px; margin: 10px 0; 
+            width: 100% !important; max-width: 320px !important; 
+            height: auto !important; border-radius: 12px; margin: 10px 0; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* 5. INPUT Y BOTONES */
-        #options-container { padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        /* 5. INPUT Y OPCIONES */
+        #options-container { padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .option-button { 
-            background: white; border: 1px solid #007bff; color: #007bff;
-            padding: 6px 12px; border-radius: 20px; font-size: 0.8em; cursor: pointer;
+            background: white; border: 1.5px solid #007bff; color: #007bff;
+            padding: 8px 15px; border-radius: 20px; font-size: 0.9em; cursor: pointer;
+            transition: 0.2s; font-weight: 600;
         }
-        #input-area { display: flex; padding: 10px; border-top: 1px solid #eee; align-items: center; }
-        #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 8px 15px; font-size: 16px; }
-        #input-area button { background: #007bff; color: white; border: none; border-radius: 50%; width: 35px; height: 35px; margin-left: 5px; }
+        #input-area { display: flex; padding: 15px; border-top: 1px solid #eee; background: white; align-items: center; }
+        #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 25px; padding: 10px 20px; font-size: 16px; }
+        #input-area button { background: #007bff; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; margin-left: 10px; cursor: pointer; }
 
         .contact-human-btn {
-            display: block; width: 90%; margin: 5px auto; padding: 12px;
+            display: block; width: 90%; margin: 5px auto 10px; padding: 15px;
             background-color: #25D366; color: white; text-align: center;
-            border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 0.9em;
+            border-radius: 30px; text-decoration: none; font-weight: bold;
         }
     </style>
 </head>
@@ -92,13 +96,11 @@
     </div>
 
 <script>
-    // URL DE TU IMPLEMENTACIÓN
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     const supportIDs = ['faq_humanofaq', 'faq_pago_pack_invmercado_whatsapp', 'faq_pago_emprendedor_digital_whatsapp', 'faq_pago_exito_garantizado_whatsapp', 'pack_emprendedor_digital_detalle_whatsapp'];
 
-    window.handleServerResponse = function(response) { handleBotResponse(response); };
-
-    function handleBotResponse(response) {
+    // FUNCIÓN DE RESPUESTA GLOBAL
+    window.handleServerResponse = function(response) {
         document.getElementById('options-container').innerHTML = '';
         addMessage('Bot', response);
         if (response.options) updateOptions(response.options);
@@ -109,29 +111,31 @@
         } else {
             document.getElementById('input-area').innerHTML = `<input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)"><button onclick="sendMessage(null, true)">›</button>`;
         }
-    }
+    };
 
     function sendMessage(msg = null, isManual = false) {
         const text = msg || document.getElementById('input').value.trim();
         if (!text) return;
         addMessage('Tú', text);
         if (isManual) document.getElementById('input').value = '';
-        document.getElementById('options-container').innerHTML = 'Escribiendo...';
+        document.getElementById('options-container').innerHTML = '<p style="color:#999">HugoBOT está pensando...</p>';
         
+        // PETICIÓN JSONP
         const script = document.createElement('script');
-        script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&callback=handleServerResponse`;
+        script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
+        script.onload = () => script.remove();
     }
 
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
         const isBot = sender === 'Bot';
-        let html = `<div class="message ${isBot ? 'bot-message' : 'user-message'}"><div class="sender">${sender}</div><div class="text">`;
+        let html = `<div class="message ${isBot ? 'bot-message' : 'user-message'}"><div class="sender" style="font-weight:bold; font-size:0.8em; margin-bottom:4px; color:#888">${sender}</div><div class="text">`;
         
         if (isBot) {
             if (data.image_url) html += `<img src="${data.image_url}" class="bot-image-preview">`;
             html += (data.content || data.welcome_saludo || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            if (data.url && !supportIDs.includes(data.id)) html += `<br><br><a href="${data.url}" target="_blank">Acceder Aquí</a>`;
+            if (data.url && !supportIDs.includes(data.id)) html += `<br><br><a href="${data.url}" target="_blank" style="color:#007bff; font-weight:bold">Acceder Aquí</a>`;
         } else {
             html += data;
         }
@@ -152,11 +156,10 @@
 
     function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(null, true); }
 
-    // CARGA INICIAL
+    // INICIO AUTOMÁTICO
     window.onload = () => {
-        document.getElementById('options-container').innerHTML = 'Iniciando...';
         const script = document.createElement('script');
-        script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse`;
+        script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
     };
 </script>
