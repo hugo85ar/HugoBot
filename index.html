@@ -7,7 +7,6 @@
     <title>HugoBOT - Tu Asistente Virtual</title>
     <style>
         /* (TU CSS COMPLETO AQUÍ) */
-        /* ... (Dejo el CSS por brevedad, pero debe estar completo) ... */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -56,7 +55,12 @@
         .message .sender { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; color: #555; }
         .message .text { padding: 10px 15px; border-radius: 18px; max-width: 80%; word-wrap: break-word; }
         .user-message .text { background-color: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .bot-message .text { background-color: #e9e9eb; color: #333; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .bot-message .text { 
+          background-color: #e9e9eb; 
+          color: #333; 
+          align-self: flex-start; 
+          border-bottom-left-radius: 4px; 
+          white-space: pre-line; }
         .bot-message a { color: #0056b3; text-decoration: none; font-weight: bold; }
         #options-container { padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .option-button { background-color: #f8f9fa; border: 1px solid #007bff; color: #007bff; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.2s; }
@@ -64,7 +68,44 @@
         #input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; }
         #input-area input { flex-grow: 1; border: 1px solid #ccc; border-radius: 20px; padding: 10px 15px; font-size: 1em; }
         #input-area button { background: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5em; cursor: pointer; margin-left: 10px; }
+        
+        /* --- CSS Adicional para el Botón de WhatsApp --- */
+        .contact-human-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #25D366; 
+            color: white;
+            text-decoration: none;
+            border-radius: 20px; 
+            font-size: 1em;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            width: 95%; 
+            margin: 0 auto;
+        }
+
+        .contact-human-btn:hover {
+            background-color: #128C7E; 
+        }
+
+        .bot-image-preview {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px; 
+            display: block; 
+        }
+
+        #input-area { 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; 
+        }
     </style>
+
 </head>
 <body>
     <div id="chat-container">
@@ -80,25 +121,85 @@
             <input id="input" type="text" placeholder="O escribe tu pregunta..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage(null, true)">›</button>
         </div>
-
     </div>
 
- <script>
+<script>
     // CRÍTICO: La URL para el acceso externo (usada solo cuando NO es Apps Script)
-    // 🚨 ATENCIÓN: Reemplaza ESTA URL con la nueva URL /exec que obtuviste en el paso anterior (sin ?callback=...)
-    const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxeK9B9uryoeOk6Sq8j1_q_RrKyPpnqOIPP-IXsW-LGJQt3csflazm3sfXnu4SSugaslA/exec";
+    const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     
-    // Función global de callback que Apps Script llamará para devolver la respuesta
     window.handleServerResponse = function(response) {
-        // Esta función recibirá la respuesta JSON del bot (ya parseada por JSONP)
         handleBotResponse(response);
     };
+    
+    // --- ARRAY DE SOPORTE GLOBAL (CRÍTICO PARA DETECCIÓN) ---
+  const supportIDs = [
+  'faq_humanofaq', 
+  'faq_soporte_investigacion', 
+  'faq_pago_local_wa',
+  'faq_pago_local_wa_gestion', 
+  'faq_humano_gest',
+  'faq_soporte_gestion',
+  'faq_pago_local_payoneer',
+  'faq_pago_pack_invmercado_whatsapp',
+  'faq_pago_emprendedor_digital_whatsapp',
+  'faq_pago_exito_garantizado_whatsapp',
+  'Empresas_Grupos_Llamada',
+  'Servicios_Empaquetados_llamada',
+  'Consultorias_1en1_llamada'  // ⬅︎ añade este id
+];
 
+    // ----------------------------------------------------------------------
+    // --- FUNCIONES DE SOPORTE PARA EL BOTÓN DE WHATSAPP ---
+    // ----------------------------------------------------------------------
+
+    // 1. Función dinámica para inyectar el botón de WhatsApp (usa la URL de la Columna E: whatsapp_url)
+    function showContactHumanButton(whatsappUrl) {
+        const inputArea = document.getElementById('input-area');
+        const buttonText = '📞 Conversar con un Asesor Humano';
+
+        const whatsappButtonHTML = `
+            <a href="${whatsappUrl}" 
+                target="_blank" 
+                class="contact-human-btn"
+                title="Haz clic para contactar directamente a un asesor.">
+                ${buttonText}
+            </a>
+        `;
+        inputArea.innerHTML = whatsappButtonHTML;
+    }
+
+    // 2. Función para restaurar la entrada de texto original
+    function restoreDefaultInput() {
+        const inputArea = document.getElementById('input-area');
+        inputArea.innerHTML = `
+            <input id="input" type="text" placeholder="O escribe tu pregunta..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage(null, true)">›</button>
+        `;
+    }
+
+    // ----------------------------------------------------------------------
+    // --- FUNCIÓN PRINCIPAL DE RESPUESTA (CONSOLIDADA) ---
+    // ----------------------------------------------------------------------
+    
     function handleBotResponse(response) {
         hideLoading();
-        // El bot ya no tiene el mensaje estático si la llamada falló, así que esto siempre es la respuesta del bot
-        addMessage('Bot', response.content, response.url);
+        
+        addMessage('Bot', response); 
         updateOptions(response.options);
+
+        // Lógica para la Derivación Inteligente (Ocultar input y mostrar botón WhatsApp)
+        const isSupportFAQ = response.id && supportIDs.includes(response.id);
+
+        if (isSupportFAQ) { 
+            // Usa la URL de la Columna E (whatsapp_url) si existe, si no, usa la Columna F (url)
+            const whatsappUrl = response.whatsapp_url && response.whatsapp_url.trim() !== '' 
+                                ? response.whatsapp_url 
+                                : response.url;
+
+            showContactHumanButton(whatsappUrl); 
+        } else {
+            restoreDefaultInput(); 
+        }
     }
 
     function handleOptionClick(optionText) {
@@ -117,7 +218,6 @@
             const script = document.createElement('script');
             script.src = initialUrl;
             document.head.appendChild(script);
-            // El onload lo manejamos dentro de handleServerResponse al recibir la primera respuesta.
         }
     });
 
@@ -141,14 +241,12 @@
         } else {
             // MODO B: GITHUB / EXTERNO (JSONP GET para el mensaje)
             const encodedMessage = encodeURIComponent(message);
-            // Usamos '&' porque el '?' ya está en la URL base si fue llamado con initial=true
             const chatUrl = `${WEB_APP_URL_BASE}?message=${encodedMessage}&callback=handleServerResponse`; 
             
             const script = document.createElement('script');
             script.src = chatUrl;
             document.head.appendChild(script);
             script.onload = () => { 
-                // Limpiamos el script tag después de su uso.
                 script.remove(); 
             }; 
         }
@@ -159,23 +257,57 @@
             sendMessage(null, true);
         }
     }
+    
 
-    // --- FUNCIONES AUXILIARES (las mantengo iguales) ---
-    function addMessage(sender, text, url) {
-        const messagesDiv = document.getElementById('messages');
-        const messageClass = sender === 'Tú' ? 'user-message' : 'bot-message';
-        
-        let messageHTML = `<div class="message ${messageClass}">`;
-        messageHTML += `<div class="sender">${sender}</div>`;
-        messageHTML += `<div class="text">${text}`;
-        if (url) {
-            messageHTML += `<br><br><a href="${url}" target="_blank">Accede aquí</a>`;
-        }
-        messageHTML += `</div></div>`;
-        
-        messagesDiv.innerHTML += messageHTML;
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    function renderContentWithBold(rawContent) {
+      if (!rawContent) return '';
+      return rawContent.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     }
+
+
+    // --- FUNCIONES AUXILIARES ---
+  function addMessage(sender, data) { 
+  const messagesDiv = document.getElementById('messages');
+  const messageClass = sender === 'Tú' ? 'user-message' : 'bot-message';
+  
+  let messageHTML = `<div class="message ${messageClass}">`;
+  
+  if (sender === 'Bot') {
+    messageHTML += `<div class="sender">Bot</div>`;
+  } else {
+    messageHTML += `<div class="sender">${sender}</div>`;
+  }
+  
+  if (sender === 'Tú') {
+    messageHTML += `<div class="text">${data}</div></div>`;
+  } else {
+    const response = data;
+    const text = response.content || response.welcome_saludo || '';
+    
+    messageHTML += `<div class="text">`;
+
+    if (response.image_url && response.image_url.trim() !== '') {
+      messageHTML += `<img src="${response.image_url}" alt="Imagen de ${response.title || 'Respuesta'}" class="bot-image-preview">`;
+    }
+
+    // aquí aplicas negrita al texto que realmente uses
+    messageHTML += renderContentWithBold(text);
+
+    // enlaces...
+    if (response.url && response.url.trim() !== '') {
+      const linkText = (response.title && response.title.includes('Gratuito')) ? 'Regístrate Aquí' : 'Accede Aquí';
+      const isSupportFAQ = supportIDs.includes(response.id); 
+      if (!isSupportFAQ) {
+        messageHTML += `<br><br><a href="${response.url}" target="_blank">${linkText}</a>`;
+      }
+    }
+
+    messageHTML += `</div></div>`;
+  }
+
+  messagesDiv.innerHTML += messageHTML;
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
 
     function updateOptions(options) {
         const optionsContainer = document.getElementById('options-container');
@@ -198,9 +330,8 @@
     
     function hideLoading() {
         const optionsContainer = document.getElementById('options-container');
-        // Quita el mensaje "Escribiendo..." pero mantiene el contenedor vacío si no hay opciones nuevas.
         if (optionsContainer.innerHTML.includes('Escribiendo')) {
-             optionsContainer.innerHTML = '';
+            optionsContainer.innerHTML = '';
         }
     }
 </script>
