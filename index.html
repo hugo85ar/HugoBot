@@ -92,20 +92,23 @@
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     const supportIDs = ['faq_humanofaq', 'faq_pago_pack_invmercado_whatsapp', 'faq_pago_emprendedor_digital_whatsapp', 'faq_pago_exito_garantizado_whatsapp', 'pack_emprendedor_digital_detalle_whatsapp'];
 
-    // CALLBACK GLOBAL PARA JSONP
+    // Forzamos que la función sea global para que el móvil la encuentre
     window.handleServerResponse = function(response) {
+        console.log("Respuesta recibida:", response);
         const container = document.getElementById('options-container');
         if (container) container.innerHTML = '';
+        
         addMessage('Bot', response);
         if (response.options) updateOptions(response.options);
         
+        // Lógica de botón de WhatsApp
         if (response.id && supportIDs.includes(response.id)) {
             const url = response.whatsapp_url || response.url;
             document.getElementById('input-area').innerHTML = `<a href="${url}" target="_blank" class="contact-human-btn">📞 Conversar con un Asesor Humano</a>`;
         } else {
-            const currentInput = document.getElementById('input');
-            if (!currentInput) {
-                document.getElementById('input-area').innerHTML = `<input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)"><button onclick="sendMessage(null, true)">›</button>`;
+            const inputArea = document.getElementById('input-area');
+            if (inputArea && !document.getElementById('input')) {
+                inputArea.innerHTML = `<input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)"><button onclick="sendMessage(null, true)">›</button>`;
             }
         }
     };
@@ -114,20 +117,26 @@
         const input = document.getElementById('input');
         const text = msg || (input ? input.value.trim() : '');
         if (!text) return;
+        
         addMessage('Tú', text);
         if (isManual && input) input.value = '';
         
         const container = document.getElementById('options-container');
-        if (container) container.innerHTML = '<p style="color:#999; font-size:0.9em;">HugoBOT está pensando...</p>';
+        if (container) container.innerHTML = '<p style="color:#999; font-size:0.8em;">HugoBOT está pensando...</p>';
         
+        // El "Cache Buster" con timestamp evita que el celular bloquee la petición
         const script = document.createElement('script');
         script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
+        
+        // Limpieza automática del script inyectado
         script.onload = () => script.remove();
+        script.onerror = () => { if(container) container.innerHTML = '<p style="color:red;">Error de conexión. Reintenta.</p>'; };
     }
 
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
+        if (!div) return;
         const isBot = sender === 'Bot';
         let html = `<div class="message ${isBot ? 'bot-message' : 'user-message'}">
                         <div class="sender" style="font-weight:bold; font-size:0.8em; margin-bottom:4px; color:#888">${sender}</div>
@@ -135,9 +144,11 @@
         
         if (isBot) {
             if (data.image_url && data.image_url.trim() !== '') {
-                html += `<img src="${data.image_url}" class="bot-image-preview" onerror="this.style.display='none'">`;
+                html += `<img src="${data.image_url}" class="bot-image-preview">`;
             }
-            html += (data.content || data.welcome_saludo || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            const content = data.content || data.welcome_saludo || '';
+            html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            
             if (data.url && !supportIDs.includes(data.id)) {
                 html += `<br><br><a href="${data.url}" target="_blank" style="color:#007bff; font-weight:bold">Acceder Aquí</a>`;
             }
@@ -162,11 +173,11 @@
 
     function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(null, true); }
 
-    // CARGA INICIAL FORZADA
+    // CARGA INICIAL ROBUSTA
     window.onload = function() {
-        const container = document.getElementById('options-container');
-        if (container) container.innerHTML = '<p style="color:#999; font-size:0.9em;">Iniciando conversación...</p>';
+        console.log("Iniciando bot...");
         const script = document.createElement('script');
+        // El parámetro &initial=true es clave para que el bot mande el saludo
         script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
     };
