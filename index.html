@@ -3,108 +3,136 @@
 <head>
     <base target="_top"> 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HugoBOT - Tu Asistente Virtual</title>
-    <style>
-        /* (TU CSS COMPLETO AQUÍ) */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-image: url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1759946006/Designer_34_s2x34f.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
 
-        #chat-container {
-            width: 100%;
-            max-width: 450px;
-            height: 90vh;
-            max-height: 700px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
 
-        #header-content {
-            background-color: #004d99;
-            color: white;
-            padding: 15px;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            text-align: center;
-            font-size: 1.2em;
-        }
-        
-        #header-content img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 10px;
-        }
+<style>
+/* 1. RESET TOTAL (Obligatorio para el Iframe de Google) */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    position: fixed !important; /* Bloquea el rebote en iPhone/Android */
+    background-image: url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1759946006/Designer_34_s2x34f.jpg');
+    background-size: cover;
+    background-position: center;
+}
 
-        #messages { flex-grow: 1; overflow-y: auto; padding: 20px; border-bottom: 1px solid #ddd; }
-        .message { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .message .sender { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; color: #555; }
-        .message .text { padding: 10px 15px; border-radius: 18px; max-width: 80%; word-wrap: break-word; }
-        .user-message .text { background-color: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .bot-message .text { 
-          background-color: #e9e9eb; 
-          color: #333; 
-          align-self: flex-start; 
-          border-bottom-left-radius: 4px; 
-          white-space: pre-line; }
-        .bot-message a { color: #0056b3; text-decoration: none; font-weight: bold; }
-        #options-container { padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .option-button { background-color: #f8f9fa; border: 1px solid #007bff; color: #007bff; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.2s; }
-        .option-button:hover { background-color: #007bff; color: white; }
-        #input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; }
-        #input-area input { flex-grow: 1; border: 1px solid #ccc; border-radius: 20px; padding: 10px 15px; font-size: 1em; }
-        #input-area button { background: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5em; cursor: pointer; margin-left: 10px; }
-        
-        /* --- CSS Adicional para el Botón de WhatsApp --- */
-        .contact-human-btn {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #25D366; 
-            color: white;
-            text-decoration: none;
-            border-radius: 20px; 
-            font-size: 1em;
-            font-weight: bold;
-            text-align: center;
-            transition: background-color 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            width: 95%; 
-            margin: 0 auto;
-        }
+/* 2. CONTENEDOR (Estrategia de Estiramiento) */
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.95);
+    transition: all 0.2s ease;
+    
+    /* Configuración por defecto (Móvil Primero) */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
 
-        .contact-human-btn:hover {
-            background-color: #128C7E; 
-        }
+/* 3. AJUSTE PARA ESCRITORIO (Solo si la pantalla es grande) */
+@media (min-width: 601px) {
+    #chat-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 450px;
+        height: 90vh;
+        max-height: 750px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+}
 
-        .bot-image-preview {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 10px; 
-            display: block; 
-        }
+/* 4. MENSAJES Y CABECERA */
+#header-content { 
+    background-color: #004d99; 
+    color: white; 
+    padding: 15px; 
+    text-align: center;
+}
 
-        #input-area { 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap; 
-        }
-    </style>
+#messages { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 15px; 
+    background: #ffffff;
+    /* Mejora el scroll en móviles */
+    -webkit-overflow-scrolling: touch; 
+}
+
+/* Imagen del bot en mensajes */
+.bot-image-preview { 
+    width: 100%; 
+    max-width: 300px; 
+    height: auto; 
+    border-radius: 10px; 
+    margin: 10px 0; 
+    display: block; 
+}
+
+/* 5. ÁREA DE INPUT Y BOTONES */
+#options-container { 
+    padding: 10px; 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 8px; 
+    justify-content: center; 
+    background: #fdfdfd; 
+}
+
+.option-button { 
+    background: #ffffff; 
+    border: 1.5px solid #007bff; 
+    color: #007bff; 
+    padding: 10px 16px; 
+    border-radius: 25px; 
+    font-size: 14px; 
+    font-weight: bold; 
+}
+
+#input-area { 
+    display: flex; 
+    padding: 12px; 
+    background: white; 
+    border-top: 1px solid #eee;
+    /* Evita que el teclado tape el input en iOS */
+    padding-bottom: max(12px, env(safe-area-inset-bottom)); 
+}
+
+#input-area input { 
+    flex: 1; 
+    border: 1px solid #ddd; 
+    border-radius: 25px; 
+    padding: 12px 18px; 
+    font-size: 16px; /* Evita zoom automático en iPhone */
+}
+
+.contact-human-btn { 
+    display: block; 
+    width: 90%; 
+    margin: 8px auto; 
+    padding: 14px; 
+    background-color: #25D366; 
+    color: white; 
+    text-align: center; 
+    border-radius: 30px; 
+    text-decoration: none; 
+    font-weight: bold; 
+}
+</style>
+
+
 
 </head>
 <body>
@@ -145,7 +173,8 @@
   'faq_pago_exito_garantizado_whatsapp',
   'Empresas_Grupos_Llamada',
   'Servicios_Empaquetados_llamada',
-  'Consultorias_1en1_llamada'  // ⬅︎ añade este id
+  'Consultorias_1en1_llamada',
+  'pack_emprendedor_digital_detalle_whatsapp' // Corregido: añadida la 'p' y quitada la coma final si es el último
 ];
 
     // ----------------------------------------------------------------------
