@@ -89,79 +89,85 @@
     </div>
 
 <script>
+    // 1. CONFIGURACIÓN
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     const supportIDs = ['faq_humanofaq', 'faq_pago_pack_invmercado_whatsapp', 'faq_pago_emprendedor_digital_whatsapp', 'faq_pago_exito_garantizado_whatsapp', 'pack_emprendedor_digital_detalle_whatsapp'];
 
-    // Forzamos que la función sea global para que el móvil la encuentre
+    // 2. FUNCIÓN GLOBAL (REFORZADA PARA MÓVIL)
     window.handleServerResponse = function(response) {
-        console.log("Respuesta recibida:", response);
-        const container = document.getElementById('options-container');
-        if (container) container.innerHTML = '';
+        console.log("Respuesta del servidor recibida");
+        const optionsContainer = document.getElementById('options-container');
+        if (optionsContainer) optionsContainer.innerHTML = '';
         
+        // Agrega el mensaje al chat
         addMessage('Bot', response);
+        
+        // Actualiza botones de opciones
         if (response.options) updateOptions(response.options);
         
-        // Lógica de botón de WhatsApp
-        if (response.id && supportIDs.includes(response.id)) {
+        // Lógica para derivación a WhatsApp
+        const isSupport = response.id && supportIDs.includes(response.id);
+        const inputArea = document.getElementById('input-area');
+        
+        if (isSupport) {
             const url = response.whatsapp_url || response.url;
-            document.getElementById('input-area').innerHTML = `<a href="${url}" target="_blank" class="contact-human-btn">📞 Conversar con un Asesor Humano</a>`;
+            inputArea.innerHTML = `<a href="${url}" target="_blank" class="contact-human-btn">📞 Conversar con un Asesor Humano</a>`;
         } else {
-            const inputArea = document.getElementById('input-area');
-            if (inputArea && !document.getElementById('input')) {
-                inputArea.innerHTML = `<input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)"><button onclick="sendMessage(null, true)">›</button>`;
-            }
+            inputArea.innerHTML = `<input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)"><button onclick="sendMessage(null, true)">›</button>`;
         }
     };
 
+    // 3. ENVÍO DE MENSAJES CON CACHE-BUSTER
     function sendMessage(msg = null, isManual = false) {
         const input = document.getElementById('input');
         const text = msg || (input ? input.value.trim() : '');
         if (!text) return;
-        
+
         addMessage('Tú', text);
         if (isManual && input) input.value = '';
         
-        const container = document.getElementById('options-container');
-        if (container) container.innerHTML = '<p style="color:#999; font-size:0.8em;">HugoBOT está pensando...</p>';
+        document.getElementById('options-container').innerHTML = '<p style="color:#999; font-size:0.8em;">HugoBOT está pensando...</p>';
         
-        // El "Cache Buster" con timestamp evita que el celular bloquee la petición
+        // Creamos el script con un timestamp (t=) para que el celular no lo bloquee
         const script = document.createElement('script');
         script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
         
-        // Limpieza automática del script inyectado
+        // Limpieza del script para no saturar el navegador
         script.onload = () => script.remove();
-        script.onerror = () => { if(container) container.innerHTML = '<p style="color:red;">Error de conexión. Reintenta.</p>'; };
     }
 
+    // 4. FUNCIÓN PARA AGREGAR MENSAJES AL DOM
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
-        if (!div) return;
         const isBot = sender === 'Bot';
         let html = `<div class="message ${isBot ? 'bot-message' : 'user-message'}">
                         <div class="sender" style="font-weight:bold; font-size:0.8em; margin-bottom:4px; color:#888">${sender}</div>
                         <div class="text">`;
         
         if (isBot) {
+            // Imagen de respuesta si existe
             if (data.image_url && data.image_url.trim() !== '') {
                 html += `<img src="${data.image_url}" class="bot-image-preview">`;
             }
+            // Texto con negritas
             const content = data.content || data.welcome_saludo || '';
             html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
             
+            // Link de acceso (si no es soporte)
             if (data.url && !supportIDs.includes(data.id)) {
                 html += `<br><br><a href="${data.url}" target="_blank" style="color:#007bff; font-weight:bold">Acceder Aquí</a>`;
             }
         } else {
             html += data;
         }
+        
         div.innerHTML += html + `</div></div>`;
         div.scrollTop = div.scrollHeight;
     }
 
     function updateOptions(options) {
         const container = document.getElementById('options-container');
-        if (!container) return;
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-button';
@@ -173,11 +179,11 @@
 
     function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(null, true); }
 
-    // CARGA INICIAL ROBUSTA
+    // 5. CARGA INICIAL (FORZADA PARA CELULAR)
     window.onload = function() {
-        console.log("Iniciando bot...");
+        console.log("Iniciando conexión...");
         const script = document.createElement('script');
-        // El parámetro &initial=true es clave para que el bot mande el saludo
+        // El timestamp &t= es vital para que el celular reciba los datos reales
         script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
     };
