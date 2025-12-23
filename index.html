@@ -61,11 +61,28 @@
         #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 15px; font-size: 16px; }
         #input-area button { background: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; margin-left: 8px; font-size: 1.2em; }
 
-        .contact-human-btn {
-            display: block; width: 90%; margin: 5px auto; padding: 12px;
-            background-color: #25D366; color: white; text-align: center;
-            border-radius: 25px; text-decoration: none; font-weight: bold;
-        }
+        /* Mejora para que resalte más */
+.contact-human-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Que ocupe todo el ancho del input-area */
+    margin: 0; 
+    padding: 15px;
+    background-color: #25D366; 
+    color: white;
+    text-align: center;
+    border-radius: 10px; /* Un poco menos redondeado para que parezca botón de acción */
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    transition: background 0.3s ease;
+}
+
+.contact-human-btn:hover {
+    background-color: #128C7E;
+}
     </style>
 </head>
 <body>
@@ -84,7 +101,12 @@
 
 <script>
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
-    const supportIDs = ['faq_humanofaq', 'faq_pago_pack_invmercado_whatsapp', 'faq_pago_emprendedor_digital_whatsapp', 'faq_pago_exito_garantizado_whatsapp', 'pack_emprendedor_digital_detalle_whatsapp'];
+    const supportIDs = ['faq_humanofaq', 
+    'faq_pago_pack_invmercado_whatsapp', 
+    'faq_pago_emprendedor_digital_whatsapp', 
+    'faq_pago_exito_garantizado_whatsapp', 
+    'pack_emprendedor_digital_detalle_whatsapp',
+    'faq_soporte_investigacion'];
 
     // FUNCIÓN DE RESPUESTA GLOBAL
     window.handleServerResponse = function(response) {
