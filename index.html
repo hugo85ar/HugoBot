@@ -3,74 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HugoBOT - Tu Asistente Virtual</title>
+    <title>HugoBOT</title>
     <style>
-        /* 1. RESET Y FONDO GLOBAL */
+        /* 1. RESET PARA ELIMINAR EL EFECTO "FLOTANTE" */
         html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; position: fixed; 
-            background: #1a0b2e url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1759946006/Designer_34_s2x34f.jpg') no-repeat center center fixed;
-            background-size: cover; font-family: sans-serif;
+            margin: 0 !important; padding: 0 !important; 
+            width: 100% !important; height: 100% !important; 
+            overflow: hidden !important; position: fixed !important; 
+            background: #1a0b2e url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1759946006/Designer_34_s2x34f.jpg') center center no-repeat;
+            background-size: cover;
         }
 
-        /* 2. CONTENEDOR (Full screen en móvil, 500px en Notebook) */
+        /* 2. CONTENEDOR (Fuerza pantalla completa en Apps Script y GitHub) */
         #chat-container {
             display: flex; flex-direction: column;
-            background: #ffffff; position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff;
+            position: fixed; top: 0; left: 0; 
+            width: 100vw !important; height: 100vh !important;
             z-index: 1000;
         }
 
+        /* Ajuste para Notebook */
         @media (min-width: 601px) {
             #chat-container {
-                width: 500px !important; height: 85vh !important;
+                width: 480px !important; height: 85vh !important;
                 top: 50%; left: 50%; transform: translate(-50%, -50%);
-                border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+                border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             }
         }
 
-        /* 3. CABECERA - FIX DEFINITIVO ROBOT */
+        /* 3. CABECERA (Robot siempre pequeño) */
         #header-content {
             background-color: #004d99; color: white;
-            padding: 12px; text-align: center; flex-shrink: 0;
+            padding: 10px; text-align: center; flex-shrink: 0;
         }
 
         #header-content img {
-            width: 70px !important; height: 70px !important;
-            max-width: 70px !important; max-height: 70px !important;
-            border-radius: 50%; object-fit: cover;
-            border: 3px solid white; display: block; margin: 0 auto 5px;
+            width: 65px !important; height: 65px !important;
+            border-radius: 50%; border: 2px solid white;
+            object-fit: cover; display: block; margin: 0 auto 5px;
         }
-
-        #header-content div { font-weight: bold; font-size: 1.1em; }
 
         /* 4. MENSAJES */
         #messages { flex: 1; overflow-y: auto; padding: 15px; background: white; -webkit-overflow-scrolling: touch; }
-        .message { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .text { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 0.95em; line-height: 1.5; }
-        .bot-message .text { background: #f1f0f2; align-self: flex-start; border-bottom-left-radius: 4px; color: #333; }
-        .user-message .text { background: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .message { margin-bottom: 12px; display: flex; flex-direction: column; font-family: sans-serif; }
+        .text { padding: 10px 14px; border-radius: 15px; max-width: 85%; font-size: 15px; line-height: 1.4; }
+        .bot-message .text { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user-message .text { background: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
 
-        .bot-image-preview { 
-            width: 100% !important; max-width: 320px !important; 
-            height: auto !important; border-radius: 12px; margin: 10px 0; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: block;
-        }
+        /* Imágenes de Packs */
+        .bot-image-preview { width: 100% !important; max-width: 300px !important; height: auto !important; border-radius: 10px; margin-bottom: 8px; }
 
-        /* 5. INPUT Y BOTONES */
-        #options-container { padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .option-button { 
-            background: white; border: 1.5px solid #007bff; color: #007bff;
-            padding: 8px 15px; border-radius: 20px; font-size: 0.9em; cursor: pointer; font-weight: 600;
-        }
-        #input-area { display: flex; padding: 15px; border-top: 1px solid #eee; background: white; align-items: center; }
-        #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 25px; padding: 10px 20px; font-size: 16px; }
-        #input-area button { background: #007bff; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; margin-left: 10px; cursor: pointer; }
+        /* 5. ÁREA DE CONTROL */
+        #options-container { padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .option-button { background: white; border: 1px solid #007bff; color: #007bff; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+        #input-area { display: flex; padding: 10px; border-top: 1px solid #eee; background: white; }
+        #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 15px; font-size: 16px; }
+        #input-area button { background: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; margin-left: 8px; font-size: 1.2em; }
 
         .contact-human-btn {
-            display: block; width: 90%; margin: 5px auto 10px; padding: 15px;
+            display: block; width: 90%; margin: 5px auto; padding: 12px;
             background-color: #25D366; color: white; text-align: center;
-            border-radius: 30px; text-decoration: none; font-weight: bold;
+            border-radius: 25px; text-decoration: none; font-weight: bold;
         }
     </style>
 </head>
@@ -78,7 +72,7 @@
     <div id="chat-container">
         <div id="header-content">
             <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1759943005/202510080950_portada_r85ywo.jpg" alt="Hugobot">
-            <div>HugoBOT - Tu Asistente Virtual</div>
+            <div style="font-weight:bold; font-size:1.1em;">HugoBOT - Tu Asistente Virtual</div>
         </div>
         <div id="messages"></div>
         <div id="options-container"></div>
@@ -89,27 +83,17 @@
     </div>
 
 <script>
-    // 1. CONFIGURACIÓN
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     const supportIDs = ['faq_humanofaq', 'faq_pago_pack_invmercado_whatsapp', 'faq_pago_emprendedor_digital_whatsapp', 'faq_pago_exito_garantizado_whatsapp', 'pack_emprendedor_digital_detalle_whatsapp'];
 
-    // 2. FUNCIÓN GLOBAL (REFORZADA PARA MÓVIL)
+    // FUNCIÓN DE RESPUESTA GLOBAL
     window.handleServerResponse = function(response) {
-        console.log("Respuesta del servidor recibida");
-        const optionsContainer = document.getElementById('options-container');
-        if (optionsContainer) optionsContainer.innerHTML = '';
-        
-        // Agrega el mensaje al chat
+        document.getElementById('options-container').innerHTML = '';
         addMessage('Bot', response);
-        
-        // Actualiza botones de opciones
         if (response.options) updateOptions(response.options);
         
-        // Lógica para derivación a WhatsApp
-        const isSupport = response.id && supportIDs.includes(response.id);
         const inputArea = document.getElementById('input-area');
-        
-        if (isSupport) {
+        if (response.id && supportIDs.includes(response.id)) {
             const url = response.whatsapp_url || response.url;
             inputArea.innerHTML = `<a href="${url}" target="_blank" class="contact-human-btn">📞 Conversar con un Asesor Humano</a>`;
         } else {
@@ -117,51 +101,31 @@
         }
     };
 
-    // 3. ENVÍO DE MENSAJES CON CACHE-BUSTER
     function sendMessage(msg = null, isManual = false) {
-        const input = document.getElementById('input');
-        const text = msg || (input ? input.value.trim() : '');
+        const text = msg || document.getElementById('input').value.trim();
         if (!text) return;
-
         addMessage('Tú', text);
-        if (isManual && input) input.value = '';
-        
+        if (isManual) document.getElementById('input').value = '';
         document.getElementById('options-container').innerHTML = '<p style="color:#999; font-size:0.8em;">HugoBOT está pensando...</p>';
         
-        // Creamos el script con un timestamp (t=) para que el celular no lo bloquee
         const script = document.createElement('script');
         script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
-        
-        // Limpieza del script para no saturar el navegador
         script.onload = () => script.remove();
     }
 
-    // 4. FUNCIÓN PARA AGREGAR MENSAJES AL DOM
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
         const isBot = sender === 'Bot';
-        let html = `<div class="message ${isBot ? 'bot-message' : 'user-message'}">
-                        <div class="sender" style="font-weight:bold; font-size:0.8em; margin-bottom:4px; color:#888">${sender}</div>
-                        <div class="text">`;
+        let html = `<div class="message ${isBot ? 'bot-message' : 'user-message'}"><div class="sender" style="font-weight:bold; font-size:0.7em; margin-bottom:2px; color:#999">${sender}</div><div class="text">`;
         
         if (isBot) {
-            // Imagen de respuesta si existe
-            if (data.image_url && data.image_url.trim() !== '') {
-                html += `<img src="${data.image_url}" class="bot-image-preview">`;
-            }
-            // Texto con negritas
-            const content = data.content || data.welcome_saludo || '';
-            html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            
-            // Link de acceso (si no es soporte)
-            if (data.url && !supportIDs.includes(data.id)) {
-                html += `<br><br><a href="${data.url}" target="_blank" style="color:#007bff; font-weight:bold">Acceder Aquí</a>`;
-            }
+            if (data.image_url) html += `<img src="${data.image_url}" class="bot-image-preview">`;
+            html += (data.content || data.welcome_saludo || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            if (data.url && !supportIDs.includes(data.id)) html += `<br><br><a href="${data.url}" target="_blank" style="color:#007bff; font-weight:bold">Acceder Aquí</a>`;
         } else {
             html += data;
         }
-        
         div.innerHTML += html + `</div></div>`;
         div.scrollTop = div.scrollHeight;
     }
@@ -179,13 +143,14 @@
 
     function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(null, true); }
 
-    // 5. CARGA INICIAL (FORZADA PARA CELULAR)
+    // CARGA INICIAL REFORZADA PARA GITHUB EN CELULAR
     window.onload = function() {
-        console.log("Iniciando conexión...");
-        const script = document.createElement('script');
-        // El timestamp &t= es vital para que el celular reciba los datos reales
-        script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
-        document.head.appendChild(script);
+        document.getElementById('options-container').innerHTML = '<p style="color:#999; font-size:0.8em;">Iniciando...</p>';
+        setTimeout(() => {
+            const script = document.createElement('script');
+            script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
+            document.head.appendChild(script);
+        }, 500); // Pequeña espera para asegurar que el DOM esté listo en móviles
     };
 </script>
 </body>
