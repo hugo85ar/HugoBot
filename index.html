@@ -11,7 +11,7 @@
             width: 100% !important; height: 100% !important; 
             overflow: hidden !important;
             background-color: #1a1f36; /* Color de base */
-        }
+        } 
 
         /* Creamos un div de fondo dedicado para asegurar visibilidad */
         .bot-background {
@@ -166,29 +166,34 @@
             container.appendChild(btn);
         });
     }
-
- // Manejo de la tecla Enter
+// Manejo de la tecla Enter
 function handleKeyPress(e) { 
     if (e.key === 'Enter') sendMessage(null, true); 
 }
 
-// Carga inicial optimizada (Sin retraso de 500ms)
-window.onload = function() {
+// CARGA ULTRA-RÁPIDA AL INICIAR
+document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('options-container');
     
-    // Mostramos el estado de carga con la clase de animación
+    // Estado de carga con diseño Premium
     if (container) {
-        container.innerHTML = '<p class="loading-dots" style="color:#999; font-size:0.9em; font-weight:bold; text-align:center; width:100%;">HugoBOT se está conectando</p>';
+        container.innerHTML = `
+            <div style="text-align:center; width:100%; padding: 10px;">
+                <p class="loading-dots" style="color:#1e3c72; font-size:0.95em; font-weight:bold; margin-bottom:5px;">
+                    HugoBOT está preparando tu asesoría
+                </p>
+                <small style="color:#999;">Conectando con el servidor...</small>
+            </div>`;
     }
     
-    // Llamada inmediata para ganar esos preciados segundos
+    // Llamada inmediata al servidor
     const script = document.createElement('script');
     script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
     document.head.appendChild(script);
     
-    // Limpieza automática del script una vez cargado
     script.onload = () => script.remove();
-};
+});
+
 </script>
 </body>
 </html>
