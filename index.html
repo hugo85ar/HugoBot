@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HugoBOT</title>
+    <title>HugoBOT | Tu Asistente Virtual</title>
     <style>
-        /* 1. RESET PARA ELIMINAR EL EFECTO "FLOTANTE" */
+        /* 1. FONDO TECNOLÓGICO */
         html, body { 
             margin: 0 !important; padding: 0 !important; 
             width: 100% !important; height: 100% !important; 
@@ -14,82 +14,80 @@
             background-size: cover;
         }
 
-        /* 2. CONTENEDOR (Fuerza pantalla completa en Apps Script y GitHub) */
+        /* 2. CONTENEDOR PRINCIPAL */
         #chat-container {
             display: flex; flex-direction: column;
-            background: #ffffff;
+            background: #ffffff; /* FONDO BLANCO RECOMENDADO */
             position: fixed; top: 0; left: 0; 
             width: 100vw !important; height: 100vh !important;
             z-index: 1000;
         }
 
-        /* Ajuste para Notebook */
+        /* Ajuste para Notebook/Escritorio */
         @media (min-width: 601px) {
             #chat-container {
                 width: 480px !important; height: 85vh !important;
                 top: 50%; left: 50%; transform: translate(-50%, -50%);
-                border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
             }
         }
 
-        /* 3. CABECERA (Robot siempre pequeño) */
+        /* 3. CABECERA VIBRANTE (Match con tu plataforma) */
         #header-content {
-            background-color: #004d99; color: white;
-            padding: 10px; text-align: center; flex-shrink: 0;
+            /* Degradado azul vibrante como el de "Mis Cursos" pero más tech */
+            background: linear-gradient(135deg, #1e3c72 0%, #1a1f36 100%); 
+            color: white;
+            padding: 15px 10px; text-align: center; flex-shrink: 0;
+            border-bottom: 3px solid #30D5C8; /* Detalle en turquesa HugoBot */
         }
 
         #header-content img {
-            width: 65px !important; height: 65px !important;
-            border-radius: 50%; border: 2px solid white;
-            object-fit: cover; display: block; margin: 0 auto 5px;
+            width: 70px !important; height: 70px !important;
+            border-radius: 50%; border: 3px solid white;
+            object-fit: cover; display: block; margin: 0 auto 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* 4. MENSAJES */
-        #messages { flex: 1; overflow-y: auto; padding: 15px; background: white; -webkit-overflow-scrolling: touch; }
-        .message { margin-bottom: 12px; display: flex; flex-direction: column; font-family: sans-serif; }
-        .text { padding: 10px 14px; border-radius: 15px; max-width: 85%; font-size: 15px; line-height: 1.4; }
-        .bot-message .text { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .user-message .text { background: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        #header-content .bot-title { font-weight: bold; font-size: 1.2em; font-family: sans-serif; }
 
-        /* Imágenes de Packs */
-        .bot-image-preview { width: 100% !important; max-width: 300px !important; height: auto !important; border-radius: 10px; margin-bottom: 8px; }
+        /* 4. MENSAJES Y CHAT */
+        #messages { flex: 1; overflow-y: auto; padding: 20px; background: #ffffff; }
+        .message { margin-bottom: 15px; display: flex; flex-direction: column; font-family: 'Open Sans', sans-serif; }
+        .text { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 15px; line-height: 1.5; }
+        
+        .bot-message .text { background: #f1f3f6; color: #333; align-self: flex-start; border-bottom-left-radius: 4px; }
+        /* Mensaje del usuario con azul vibrante */
+        .user-message .text { background: #1e3c72; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
 
-        /* 5. ÁREA DE CONTROL */
-        #options-container { padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .option-button { background: white; border: 1px solid #007bff; color: #007bff; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; }
-        #input-area { display: flex; padding: 10px; border-top: 1px solid #eee; background: white; }
-        #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 15px; font-size: 16px; }
-        #input-area button { background: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; margin-left: 8px; font-size: 1.2em; }
+        /* 5. BOTONES DE OPCIONES (Vibrantes) */
+        #options-container { padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .option-button { 
+            background: white; border: 2px solid #1e3c72; color: #1e3c72; 
+            padding: 10px 16px; border-radius: 25px; font-size: 13px; font-weight: bold; 
+            cursor: pointer; transition: all 0.2s;
+        }
+        .option-button:hover { background: #1e3c72; color: white; }
 
-        /* Mejora para que resalte más */
-.contact-human-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%; /* Que ocupe todo el ancho del input-area */
-    margin: 0; 
-    padding: 15px;
-    background-color: #25D366; 
-    color: white;
-    text-align: center;
-    border-radius: 10px; /* Un poco menos redondeado para que parezca botón de acción */
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 16px;
-    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
-    transition: background 0.3s ease;
-}
+        /* ÁREA DE ENTRADA */
+        #input-area { display: flex; padding: 15px; border-top: 1px solid #eee; background: white; }
+        #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 25px; padding: 12px 20px; font-size: 16px; outline: none; }
+        #input-area button { background: #1e3c72; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; margin-left: 10px; cursor: pointer; }
 
-.contact-human-btn:hover {
-    background-color: #128C7E;
-}
+        /* Botón Humano (WhatsApp) */
+        .contact-human-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 15px; background-color: #25D366; 
+            color: white; text-align: center; border-radius: 12px;
+            text-decoration: none; font-weight: bold; font-size: 16px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
     </style>
 </head>
 <body>
     <div id="chat-container">
         <div id="header-content">
-            <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1759943005/202510080950_portada_r85ywo.jpg" alt="Hugobot">
-            <div style="font-weight:bold; font-size:1.1em;">HugoBOT - Tu Asistente Virtual</div>
+            <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1759946006/Designer_34_s2x34f.jpg" alt="Hugobot">
+            <div class="bot-title">HugoBOT - Tu Asistente Virtual</div>
         </div>
         <div id="messages"></div>
         <div id="options-container"></div>
@@ -100,20 +98,14 @@
     </div>
 
 <script>
+    /* TU LÓGICA DE JAVASCRIPT SE MANTIENE IGUAL */
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
-    const supportIDs = ['faq_humanofaq', 
-    'faq_pago_pack_invmercado_whatsapp', 
-    'faq_pago_emprendedor_digital_whatsapp', 
-    'faq_pago_exito_garantizado_whatsapp', 
-    'pack_emprendedor_digital_detalle_whatsapp',
-    'faq_soporte_investigacion'];
+    const supportIDs = ['faq_humanofaq', 'faq_pago_pack_invmercado_whatsapp', 'faq_pago_emprendedor_digital_whatsapp', 'faq_pago_exito_garantizado_whatsapp', 'pack_emprendedor_digital_detalle_whatsapp', 'faq_soporte_investigacion'];
 
-    // FUNCIÓN DE RESPUESTA GLOBAL
     window.handleServerResponse = function(response) {
         document.getElementById('options-container').innerHTML = '';
         addMessage('Bot', response);
         if (response.options) updateOptions(response.options);
-        
         const inputArea = document.getElementById('input-area');
         if (response.id && supportIDs.includes(response.id)) {
             const url = response.whatsapp_url || response.url;
@@ -129,7 +121,6 @@
         addMessage('Tú', text);
         if (isManual) document.getElementById('input').value = '';
         document.getElementById('options-container').innerHTML = '<p style="color:#999; font-size:0.8em;">HugoBOT está pensando...</p>';
-        
         const script = document.createElement('script');
         script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
@@ -139,15 +130,12 @@
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
         const isBot = sender === 'Bot';
-        let html = `<div class="message ${isBot ? 'bot-message' : 'user-message'}"><div class="sender" style="font-weight:bold; font-size:0.7em; margin-bottom:2px; color:#999">${sender}</div><div class="text">`;
-        
+        let html = `<div class="message ${isBot ? 'bot-message' : 'user-message'}"><div class="sender" style="font-weight:bold; font-size:0.7em; margin-bottom:4px; color:#999">${sender}</div><div class="text">`;
         if (isBot) {
-            if (data.image_url) html += `<img src="${data.image_url}" class="bot-image-preview">`;
+            if (data.image_url) html += `<img src="${data.image_url}" class="bot-image-preview" style="width:100%; border-radius:10px; margin-bottom:10px;">`;
             html += (data.content || data.welcome_saludo || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            if (data.url && !supportIDs.includes(data.id)) html += `<br><br><a href="${data.url}" target="_blank" style="color:#007bff; font-weight:bold">Acceder Aquí</a>`;
-        } else {
-            html += data;
-        }
+            if (data.url && !supportIDs.includes(data.id)) html += `<br><br><a href="${data.url}" target="_blank" style="color:#1e3c72; font-weight:bold">Acceder Aquí</a>`;
+        } else { html += data; }
         div.innerHTML += html + `</div></div>`;
         div.scrollTop = div.scrollHeight;
     }
@@ -156,8 +144,7 @@
         const container = document.getElementById('options-container');
         options.forEach(opt => {
             const btn = document.createElement('button');
-            btn.className = 'option-button';
-            btn.textContent = opt;
+            btn.className = 'option-button'; btn.textContent = opt;
             btn.onclick = () => sendMessage(opt);
             container.appendChild(btn);
         });
@@ -165,14 +152,13 @@
 
     function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(null, true); }
 
-    // CARGA INICIAL REFORZADA PARA GITHUB EN CELULAR
     window.onload = function() {
         document.getElementById('options-container').innerHTML = '<p style="color:#999; font-size:0.8em;">Iniciando...</p>';
         setTimeout(() => {
             const script = document.createElement('script');
             script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
             document.head.appendChild(script);
-        }, 500); // Pequeña espera para asegurar que el DOM esté listo en móviles
+        }, 500);
     };
 </script>
 </body>
