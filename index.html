@@ -62,11 +62,22 @@
         }
 
         #header-content img {
-            width: 70px; height: 70px;
-            border-radius: 50%; border: 3px solid white;
-            object-fit: cover; display: block; margin: 0 auto 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
+    width: 70px !important;
+    height: 70px !important;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 8px;
+    /* Resplandor azul vibrante */
+    box-shadow: 0 0 15px rgba(48, 213, 200, 0.6), 0 4px 10px rgba(0,0,0,0.3);
+    /* Efecto de pulso suave */
+    animation: botGlow 3s infinite alternate ease-in-out;
+}
+        @keyframes botGlow {
+    from { box-shadow: 0 0 10px rgba(48, 213, 200, 0.4); }
+    to { box-shadow: 0 0 25px rgba(48, 213, 200, 0.8); }
+}
 
         #header-content div { font-family: 'Montserrat', sans-serif; }
 
