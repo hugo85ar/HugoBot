@@ -54,10 +54,14 @@
 
         /* LIMITADOR DE IMÁGENES INTERNAS */
         #messages img {
-            max-width: 85% !important;
-            max-height: 140px !important; /* Clave para que no ocupen toda la pantalla */
-            border-radius: 10px; margin: 10px auto !important; display: block;
-        }
+    max-width: 95% !important; /* Casi todo el ancho disponible */
+    max-height: 250px !important; /* Aumentado de 140px a 250px */
+    height: auto !important; /* Mantiene la proporción original */
+    border-radius: 12px; 
+    margin: 12px auto !important; 
+    display: block;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Un toque de relieve para que resalten */
+}
 
         .text { padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; margin-top: 4px; }
         .bot-message { background: #f1f3f6; color: #333; align-self: flex-start; }
