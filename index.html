@@ -80,20 +80,6 @@
             color: white; text-align: center; border-radius: 12px;
             text-decoration: none; font-weight: bold;
         }
-
-        /* Animación de pulso para el texto de carga */
-    .waking-up {
-        animation: pulseText 1.5s ease-in-out infinite;
-        color: #1e3c72;
-        font-family: 'Montserrat', sans-serif;
-        text-align: center;
-        margin-top: 50px;
-    }
-    @keyframes pulseText {
-        0%, 100% { opacity: 0.5; transform: scale(0.98); }
-        50% { opacity: 1; transform: scale(1); }
-    }
-        
     </style>
 </head>
 <body>
@@ -168,28 +154,11 @@
     function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(null, true); }
 
     window.onload = function() {
-        // 1. LLENAMOS EL VACÍO INMEDIATAMENTE
-        const messageArea = document.getElementById('messages');
-        const optionsArea = document.getElementById('options-container');
-        
-        if (messageArea) {
-            messageArea.innerHTML = `
-                <div class="waking-up">
-                    <i class="fas fa-robot" style="font-size: 40px; margin-bottom: 15px; color: #30D5C8;"></i>
-                    <p><strong>HugoBOT está despertando...</strong></p>
-                    <p style="font-size: 0.8em; color: #999;">Preparando herramientas para tu emprendimiento</p>
-                </div>
-            `;
-        }
-        
-        if (optionsArea) {
-            optionsArea.innerHTML = '<p class="loading-dots" style="color:#999; font-size:0.8em;">Conectando...</p>';
-        }
-
-        // 2. LLAMADA AL SERVIDOR
-        const script = document.createElement('script');
-        script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
-        document.head.appendChild(script);
+        setTimeout(() => {
+            const script = document.createElement('script');
+            script.src = `${WEB_APP_URL_BASE}?initial=true&callback=handleServerResponse&t=${new Date().getTime()}`;
+            document.head.appendChild(script);
+        }, 500);
     };
 </script>
 </body>
