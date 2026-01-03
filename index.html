@@ -37,7 +37,6 @@
                 border-radius: 20px; 
                 box-shadow: 0 30px 60px rgba(0,0,0,0.7);
             }
-            .text { font-size: 16px !important; }
         }
 
         /* 3. CABECERA */
@@ -57,14 +56,6 @@
             background: #ffffff; display: flex; flex-direction: column;
         }
 
-        #messages img {
-            max-width: 95% !important;
-            max-height: 250px !important;
-            height: auto !important;
-            border-radius: 12px; margin: 12px auto !important; display: block;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
         .text { padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; margin-top: 4px; }
         .bot-message { background: #f1f3f6; color: #333; align-self: flex-start; }
         .user-message { background: #1e3c72; color: white; align-self: flex-end; }
@@ -82,16 +73,20 @@
             cursor: pointer; font-size: 13px; transition: 0.2s;
         }
 
+        /* BOTÓN ESPECIAL DE BONO */
+        .bono-btn {
+            background-color: #28a745 !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            width: 90%;
+            margin-bottom: 5px;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
         #input-area { display: flex; padding: 10px 15px; border-top: 1px solid #eee; background: white; flex-shrink: 0; }
         #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 25px; padding: 8px 15px; font-size: 14px; outline: none; }
         #input-area button { background: #1e3c72; color: white; border: none; border-radius: 50%; width: 35px; height: 35px; margin-left: 10px; cursor: pointer; }
-
-        .contact-human-btn {
-            display: flex; align-items: center; justify-content: center;
-            width: 100%; padding: 12px; background-color: #25D366; 
-            color: white; text-align: center; border-radius: 12px;
-            text-decoration: none; font-weight: bold; font-size: 14px;
-        }
     </style>
 </head>
 <body>
@@ -99,7 +94,7 @@
     <div id="chat-container">
         <div id="header-content">
             <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1759943005/202510080950_portada_r85ywo.jpg" alt="Hugobot">
-            <div style="font-weight:bold; font-size:1em;">HugoBOT - Tu Asistente Virtual</div>
+            <div style="font-weight:bold; font-size:1em;">HugoBOT - Asistente para Emprendedores</div>
         </div>
         <div id="messages"></div>
         <div id="options-container"></div>
@@ -111,22 +106,23 @@
 
 <script>
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
-    const supportIDs = ['faq_humanofaq', 'faq_pago_pack_invmercado_whatsapp', 'faq_pago_emprendedor_digital_whatsapp', 'faq_pago_exito_garantizado_whatsapp', 'pack_emprendedor_digital_detalle_whatsapp', 'faq_soporte_investigacion', 'curso_googlefaq'];
+    // URL DE TU FORMULARIO DE GOOGLE
+    const FORMULARIO_BONO_URL = "https://docs.google.com/forms/d/e/1FAIpQLScdW9XsjGuecoyfO2TRdllwNATM-K5jjKf3AweaB4zYQnkuuw/viewform?usp=header";
 
     window.handleServerResponse = function(response) {
         document.getElementById('options-container').innerHTML = '';
+        
+        // Agregar botón de Bono SIEMPRE al inicio
+        if (response.isInitial) {
+            const bonoBtn = document.createElement('button');
+            bonoBtn.className = "option-btn bono-btn";
+            bonoBtn.innerHTML = "🎁 RECLAMAR MI BONO";
+            bonoBtn.onclick = () => window.open(FORMULARIO_BONO_URL, '_blank');
+            document.getElementById('options-container').appendChild(bonoBtn);
+        }
+
         addMessage('Bot', response);
         if (response.options) updateOptions(response.options);
-        
-        const inputArea = document.getElementById('input-area');
-        
-        // Esta lógica es para la Columna E (Botón de WhatsApp que reemplaza el input)
-        if (response.id && supportIDs.includes(response.id)) {
-            const url = response.whatsapp_url || response.url;
-            inputArea.innerHTML = `<a href="${url}" target="_blank" class="contact-human-btn">📞 Conversar con un Asesor Humano</a>`;
-        } else {
-            inputArea.innerHTML = `<input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)"><button onclick="sendMessage(null, true)">›</button>`;
-        }
     };
 
     function sendMessage(msg = null, isManual = false) {
@@ -141,32 +137,20 @@
         script.onload = () => script.remove();
     }
 
-    // FUNCIÓN CORREGIDA PARA LEER COLUMNA F (data.url)
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
         const isBot = sender === 'Bot';
-        
         let html = `<div style="margin-bottom:15px; display:flex; flex-direction:column;">
                     <div style="font-weight:bold; font-size:0.7em; color:#999">${sender}</div>
                     <div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
         
         if (isBot) {
-            // Renderizar Imagen (Columna I)
-            if (data.image_url) html += `<img src="${data.image_url}">`;
-            
-            // Renderizar Texto (Columna E)
+            if (data.image_url) html += `<img src="${data.image_url}" style="max-width:100%; border-radius:10px; margin-bottom:10px;">`;
             html += (data.content || data.welcome_saludo || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            
-            // Renderizar Enlace Azul (Columna F - data.url)
             if (data.url) {
-                html += `<br><br><a href="${data.url}" target="_blank" 
-                           style="color: #1e3c72; font-weight: bold; text-decoration: underline; display: block; margin-top: 5px;">
-                           👉 Haz clic aquí para acceder
-                        </a>`;
+                html += `<br><br><a href="${data.url}" target="_blank" style="color:#1e3c72; font-weight:bold; text-decoration:underline;">👉 Acceder aquí</a>`;
             }
-        } else { 
-            html += data; 
-        }
+        } else { html += data; }
         
         div.innerHTML += html + `</div></div>`;
         div.scrollTop = div.scrollHeight;
