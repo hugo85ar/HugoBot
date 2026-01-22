@@ -64,35 +64,38 @@
 <script>
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbyKFpYuHEOXpZawzoqy_YMDWzxqLfVGcSbgUlXJ63O-5pAnTFnyNeERk_kpOI8XwTW8oA/exec";
 
-    function addMessage(sender, data) {
-        const div = document.getElementById('messages');
-        const isBot = sender === 'Bot';
-        let html = '<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ' + (isBot ? 'flex-start' : 'flex-end') + ';">';
-        html += '<div style="font-weight:bold; font-size:0.7em; color:#999; margin-bottom:2px;">' + sender + '</div>';
-        html += '<div class="text ' + (isBot ? 'bot-message' : 'user-message') + '">';
+   function addMessage(sender, data) {
+    const div = document.getElementById('messages');
+    const isBot = sender === 'Bot';
+    let html = '<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ' + (isBot ? 'flex-start' : 'flex-end') + ';">';
+    
+    // CORRECCIÓN ACCESIBILIDAD: Gris más oscuro (#57606f) para contraste
+    html += '<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">' + sender + '</div>';
+    html += '<div class="text ' + (isBot ? 'bot-message' : 'user-message') + '">';
 
-        if (isBot) {
-          if (data.image_url) {
-    let optimizedUrl = data.image_url;
-    if (optimizedUrl.includes('cloudinary.com')) {
-        // Reducimos un poco más el ancho para móvil (w_350)
-        optimizedUrl = optimizedUrl.replace('/upload/', '/upload/w_350,q_auto,f_auto/');
-    }
-                html += '<img src="' + optimizedUrl + '" alt="HugoBOT info" width="350" height="200" style="width:100%; height:auto; border-radius:10px; margin-bottom:10px; display:block;">';
-}
-            let content = data.content || '';
-            html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            if (data.url) {
-                html += '<div style="margin-top:10px;"><a href="' + data.url + '" target="_blank" style="display:block; background:#30D5C8; color:white; padding:10px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold;">🔗 Ir al enlace</a></div>';
+    if (isBot) {
+        if (data.image_url) {
+            let optimizedUrl = data.image_url;
+            if (optimizedUrl.includes('cloudinary.com')) {
+                // CORRECCIÓN RESOLUCIÓN: Subimos a w_500 para nitidez en móviles
+                optimizedUrl = optimizedUrl.replace('/upload/', '/upload/w_500,q_auto,f_auto/');
             }
-        } else {
-            html += data;
+            // CORRECCIÓN RENDIMIENTO: Añadimos width y height fijos
+            html += '<img src="' + optimizedUrl + '" alt="HugoBOT info" width="350" height="250" style="width:100%; height:auto; border-radius:10px; margin-bottom:10px; display:block;">';
         }
-
-        html += '</div></div>';
-        div.innerHTML += html;
-        div.scrollTop = div.scrollHeight;
+        let content = data.content || '';
+        html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        if (data.url) {
+            html += '<div style="margin-top:10px;"><a href="' + data.url + '" target="_blank" style="display:block; background:#30D5C8; color:white; padding:10px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold;">🔗 Ir al enlace</a></div>';
+        }
+    } else {
+        html += data;
     }
+
+    html += '</div></div>';
+    div.innerHTML += html;
+    div.scrollTop = div.scrollHeight;
+}
 
     window.handleServerResponse = function(response) {
         const inputArea = document.getElementById('input-area');
