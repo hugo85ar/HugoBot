@@ -3,8 +3,24 @@
 <head>
     <meta charset="UTF-8">
     
-    
     <title>HugoBOT | Tu Asistente Virtual de Productividad</title>
+
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2189151328193841');
+    fbq('track', 'PageView');
+    fbq('track', 'Contact'); // Avisamos que alguien abrió el chat específicamente
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2189151328193841&ev=PageView&noscript=1"
+    /></noscript>
     <meta name="description" content="Optimiza tu emprendimiento con HugoBOT. Consultorías, formación en Google Sheets y automatización de procesos para freelancers y equipos.">
     <meta name="keywords" content="HugoBOT, Google Sheets, Automatización, Emprendedores, Productividad, Consultoría Digital">
     <link rel="canonical" href="https://hugo85ar.github.io/HugoBot/">
@@ -21,7 +37,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     
     <style>
-        /* Mantenemos tu CSS que está excelente */
+        /* Tus estilos CSS se mantienen intactos */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #1a1f36; font-family: sans-serif; }
         .bot-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1767020899/FOTO_LOGIN_PLATAFORMA_ok3et0.avif') center center no-repeat; background-size: cover; filter: blur(6px) brightness(0.6); z-index: 1; transform: scale(1.05); }
         #chat-container { display: flex; flex-direction: column; background: #ffffff; position: fixed; z-index: 1000; top: 0; left: 0; width: 100vw; height: 100vh; }
@@ -45,15 +61,11 @@
     <main id="chat-container">
         <header>
             <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1770301307/HugoBot_xkcs39.png" 
-           
-         alt="HugoBOT Logo" 
-         width="70" 
-         height="70" 
-         fetchpriority="high"> <div style="font-weight:bold; font-size:1.2em;">HugoBOT - Tu Asistente Virtual</div>
+            alt="HugoBOT Logo" width="70" height="70" fetchpriority="high"> 
+            <div style="font-weight:bold; font-size:1.2em;">HugoBOT - Tu Asistente Virtual</div>
         </header>
 
         <div id="messages" role="log" aria-live="polite"></div>
-        
         <div id="options-container" style="padding:10px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
         
         <div id="input-area">
@@ -70,7 +82,6 @@
     const isBot = sender === 'Bot';
     let html = '<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ' + (isBot ? 'flex-start' : 'flex-end') + ';">';
     
-    // CORRECCIÓN ACCESIBILIDAD: Gris más oscuro (#57606f) para contraste
     html += '<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">' + sender + '</div>';
     html += '<div class="text ' + (isBot ? 'bot-message' : 'user-message') + '">';
 
@@ -78,10 +89,8 @@
         if (data.image_url) {
             let optimizedUrl = data.image_url;
             if (optimizedUrl.includes('cloudinary.com')) {
-                // CORRECCIÓN RESOLUCIÓN: Subimos a w_500 para nitidez en móviles
                 optimizedUrl = optimizedUrl.replace('/upload/', '/upload/w_500,q_auto,f_auto/');
             }
-            // CORRECCIÓN RENDIMIENTO: Añadimos width y height fijos
             html += '<img src="' + optimizedUrl + '" alt="HugoBOT info" width="350" height="250" style="width:100%; height:auto; border-radius:10px; margin-bottom:10px; display:block;">';
         }
         let content = data.content || '';
@@ -105,7 +114,8 @@
         if (response.options) updateOptions(response.options);
         if (response.whatsapp_url) {
             inputArea.style.display = 'block';
-            inputArea.innerHTML = `<a href="${response.whatsapp_url}" target="_blank" class="contact-human-btn">📞 Conversar con un Asesor</a>
+            // AGREGAMOS TRACKING AL BOTÓN DE WHATSAPP
+            inputArea.innerHTML = `<a href="${response.whatsapp_url}" target="_blank" class="contact-human-btn" onclick="fbq('track', 'Lead', {content_name: 'Chat WhatsApp'});">📞 Conversar con un Asesor</a>
                                    <button onclick="resetInput()" class="back-to-chat-btn">↩️ Volver al chat</button>`;
         } else {
             resetInput();
@@ -122,6 +132,12 @@
     function sendMessage(msg = null, isManual = false) {
         const text = msg || document.getElementById('input').value.trim();
         if (!text) return;
+        
+        // TRACKING: Si el mensaje viene de un botón (opción), lo traqueamos como interés
+        if (!isManual) {
+            fbq('track', 'FindLocation', {search_string: text}); // Usamos FindLocation para saber qué FAQ consultan
+        }
+
         addMessage('Tú', text);
         if (isManual) document.getElementById('input').value = '';
         document.getElementById('options-container').innerHTML = '<div style="color:#999; font-size:0.8em;">Hugo está buscando...</div>';
