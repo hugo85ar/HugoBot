@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>HugoBOT | Tu Asistente Virtual de Productividad</title>
+    <title>HugoBOT | MODO TEST LOGS</title>
 
     <script>
     !function(f,b,e,v,n,t,s)
@@ -15,13 +15,8 @@
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '2189151328193841');
     fbq('track', 'PageView');
-    fbq('track', 'Contact');
     </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=2189151328193841&ev=PageView&noscript=1"
-    /></noscript>
 
-    <meta name="description" content="Optimiza tu emprendimiento con HugoBOT. Consultorías, formación en Google Sheets y automatización de procesos para freelancers y equipos.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     
     <style>
@@ -48,14 +43,14 @@
     <main id="chat-container">
         <header>
             <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1770301307/HugoBot_xkcs39.png" alt="HugoBOT Logo"> 
-            <div style="font-weight:bold; font-size:1.2em;">HugoBOT - Tu Asistente Virtual</div>
+            <div style="font-weight:bold; font-size:1.2em;">HugoBOT - Test de Identidad</div>
         </header>
 
         <div id="messages" role="log" aria-live="polite"></div>
         <div id="options-container" style="padding:10px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
         
         <div id="input-area">
-            <input id="input" type="text" placeholder="Escribe tu nombre..." onkeypress="handleKeyPress(event)">
+            <input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage(null, true)">›</button>
         </div>
     </main>
@@ -63,27 +58,23 @@
 <script>
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbyKFpYuHEOXpZawzoqy_YMDWzxqLfVGcSbgUlXJ63O-5pAnTFnyNeERk_kpOI8XwTW8oA/exec";
     
-    // Memoria del usuario
-    let userStoredName = localStorage.getItem('hugoBot_userName');
+    // --- MODO TEST: Forzamos un nombre para ver los logs YA ---
+    let userStoredName = "Hugo_Test_Manual"; 
 
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
         const isBot = sender === 'Bot';
         let html = `<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ${isBot ? 'flex-start' : 'flex-end'};">`;
-        
         html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
         html += `<div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
 
         if (isBot) {
             if (data.image_url) {
                 let optimizedUrl = data.image_url.replace('/upload/', '/upload/w_500,q_auto,f_auto/');
-                html += `<img src="${optimizedUrl}" alt="HugoBOT info" style="width:100%; height:auto; border-radius:10px; margin-bottom:10px; display:block;">`;
+                html += `<img src="${optimizedUrl}" alt="Bot Image" style="width:100%; height:auto; border-radius:10px; margin-bottom:10px; display:block;">`;
             }
             let content = data.content || '';
             html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            if (data.url) {
-                html += `<div style="margin-top:10px;"><a href="${data.url}" target="_blank" style="display:block; background:#30D5C8; color:white; padding:10px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold;">🔗 Ir al enlace</a></div>`;
-            }
         } else {
             html += data;
         }
@@ -97,14 +88,7 @@
         document.getElementById('options-container').innerHTML = '';
         addMessage('Bot', response);
         if (response.options) updateOptions(response.options);
-        
-        const inputArea = document.getElementById('input-area');
-        if (response.whatsapp_url) {
-            inputArea.innerHTML = `<a href="${response.whatsapp_url}" target="_blank" class="contact-human-btn" onclick="fbq('track', 'Lead');">📞 Conversar con un Asesor</a>
-                                   <button onclick="resetInput()" class="back-to-chat-btn">↩️ Volver al chat</button>`;
-        } else {
-            resetInput();
-        }
+        resetInput();
     };
 
     function resetInput() {
@@ -119,31 +103,14 @@
         const text = msg || inputEl.value.trim();
         if (!text) return;
 
-        // CASO 1: Capturar el nombre por primera vez
-        if (!userStoredName) {
-            userStoredName = text;
-            localStorage.setItem('hugoBot_userName', text);
-            addMessage('Tú', text);
-            inputEl.value = '';
-            inputEl.placeholder = "Escribe aquí...";
-            
-            // Llamada inicial con el nombre recién capturado
-            const script = document.createElement('script');
-            script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
-            document.head.appendChild(script);
-            return;
-        }
-
-        // CASO 2: Navegación normal
-        if (!isManual) fbq('track', 'FindLocation', {search_string: text});
-        
         addMessage('Tú', text);
         if (isManual) inputEl.value = '';
         
-        document.getElementById('options-container').innerHTML = '<div style="color:#999; font-size:0.8em;">Hugo está buscando...</div>';
+        document.getElementById('options-container').innerHTML = '<div style="color:#999; font-size:0.8em;">Buscando...</div>';
         
         const script = document.createElement('script');
-        script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse&t=${new Date().getTime()}`;
+        // Enviamos Hugo_Test_Manual para validar la columna en Sheets
+        script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse&nocache=${new Date().getTime()}`;
         document.head.appendChild(script);
     }
 
@@ -161,13 +128,10 @@
     function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(null, true); }
 
     window.onload = function() {
-        if (!userStoredName) {
-            addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
-        } else {
-            const script = document.createElement('script');
-            script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
-            document.head.appendChild(script);
-        }
+        // En modo test, saltamos directo al saludo inicial de la hoja
+        const script = document.createElement('script');
+        script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse&t=${new Date().getTime()}`;
+        document.head.appendChild(script);
     };
 </script>
 </body>
