@@ -128,15 +128,16 @@
         });
     }
 
-    window.onload = function() {
-        if (!userStoredName) {
-            addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
-        } else {
-            const script = document.createElement('script');
-            script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
-            document.head.appendChild(script);
-        }
-    };
+window.onload = function() {
+    if (!userStoredName) {
+        // Caso A: El usuario entra por primera vez
+        addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+    } else {
+        // Caso B: Ya lo conocemos, vamos directo al saludo inicial
+        // Usamos false para que no limpie el input (isManual = false)
+        sendMessage('welcome_saludo', false);
+    }
+};
 </script>
 </body>
 </html>
