@@ -86,9 +86,26 @@
     window.handleServerResponse = function(response) {
         document.getElementById('options-container').innerHTML = '';
         addMessage('Bot', response);
+        
+        // Si la respuesta trae una URL (como la del curso gratis), creamos un botón especial
+        if (response.url) {
+            createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
+        }
+
         if (response.options) updateOptions(response.options);
     };
 
+ function createLinkButton(text, url) {
+        const container = document.getElementById('options-container');
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = "_blank"; // Abre en pestaña nueva
+        a.style = "background:#30D5C8; border:none; color:white; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer; text-decoration:none; margin:4px; display:inline-block;";
+        a.textContent = text;
+        container.appendChild(a);
+    }
+
+    
     function sendMessage(msg = null, isManual = false) {
         const inputEl = document.getElementById('input');
         const text = msg || inputEl.value.trim();
@@ -119,8 +136,10 @@
     function updateOptions(options) {
         const container = document.getElementById('options-container');
         options.forEach(opt => {
+            // Evitamos crear un botón de texto si es el mismo que el del link
+            if (opt.toLowerCase().includes("dar click")) return;
+
             const btn = document.createElement('button');
-            btn.className = "btn-option"; // Usa tus estilos
             btn.style = "background:white; border:2px solid #1e3c72; color:#1e3c72; padding:8px 14px; border-radius:20px; font-weight:bold; cursor:pointer; margin:4px;";
             btn.textContent = opt;
             btn.onclick = () => sendMessage(opt);
