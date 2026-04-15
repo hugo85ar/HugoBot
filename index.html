@@ -58,8 +58,8 @@
 <script>
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbyKFpYuHEOXpZawzoqy_YMDWzxqLfVGcSbgUlXJ63O-5pAnTFnyNeERk_kpOI8XwTW8oA/exec";
     
-    // --- MODO TEST: Forzamos un nombre para ver los logs YA ---
-    let userStoredName = "Hugo_Test_Manual"; 
+    // Recuperamos el nombre si ya existe en el navegador
+    let userStoredName = localStorage.getItem('hugoBot_userName');
 
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
@@ -71,14 +71,13 @@
         if (isBot) {
             if (data.image_url) {
                 let optimizedUrl = data.image_url.replace('/upload/', '/upload/w_500,q_auto,f_auto/');
-                html += `<img src="${optimizedUrl}" alt="Bot Image" style="width:100%; height:auto; border-radius:10px; margin-bottom:10px; display:block;">`;
+                html += `<img src="${optimizedUrl}" style="width:100%; border-radius:10px; margin-bottom:10px; display:block;">`;
             }
             let content = data.content || '';
             html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
         } else {
             html += data;
         }
-
         html += '</div></div>';
         div.innerHTML += html;
         div.scrollTop = div.scrollHeight;
@@ -88,29 +87,32 @@
         document.getElementById('options-container').innerHTML = '';
         addMessage('Bot', response);
         if (response.options) updateOptions(response.options);
-        resetInput();
     };
-
-    function resetInput() {
-        const inputArea = document.getElementById('input-area');
-        inputArea.style.display = 'flex';
-        inputArea.innerHTML = `<input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)">
-                               <button onclick="sendMessage(null, true)">›</button>`;
-    }
 
     function sendMessage(msg = null, isManual = false) {
         const inputEl = document.getElementById('input');
         const text = msg || inputEl.value.trim();
         if (!text) return;
 
+        // SI NO TENEMOS NOMBRE: Lo guardamos y lanzamos el saludo inicial
+        if (!userStoredName) {
+            userStoredName = text;
+            localStorage.setItem('hugoBot_userName', text);
+            addMessage('Tú', text);
+            inputEl.value = '';
+            inputEl.placeholder = "Escribe aquí...";
+            
+            const script = document.createElement('script');
+            script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
+            document.head.appendChild(script);
+            return;
+        }
+
+        // FLUJO NORMAL
         addMessage('Tú', text);
         if (isManual) inputEl.value = '';
-        
-        document.getElementById('options-container').innerHTML = '<div style="color:#999; font-size:0.8em;">Buscando...</div>';
-        
         const script = document.createElement('script');
-        // Enviamos Hugo_Test_Manual para validar la columna en Sheets
-        script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse&nocache=${new Date().getTime()}`;
+        script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
     }
 
@@ -118,20 +120,22 @@
         const container = document.getElementById('options-container');
         options.forEach(opt => {
             const btn = document.createElement('button');
-            btn.style = "background:white; border:2px solid #1e3c72; color:#1e3c72; padding:8px 14px; border-radius:20px; font-weight:bold; cursor:pointer;";
+            btn.className = "btn-option"; // Usa tus estilos
+            btn.style = "background:white; border:2px solid #1e3c72; color:#1e3c72; padding:8px 14px; border-radius:20px; font-weight:bold; cursor:pointer; margin:4px;";
             btn.textContent = opt;
             btn.onclick = () => sendMessage(opt);
             container.appendChild(btn);
         });
     }
 
-    function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(null, true); }
-
     window.onload = function() {
-        // En modo test, saltamos directo al saludo inicial de la hoja
-        const script = document.createElement('script');
-        script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse&t=${new Date().getTime()}`;
-        document.head.appendChild(script);
+        if (!userStoredName) {
+            addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+        } else {
+            const script = document.createElement('script');
+            script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
+            document.head.appendChild(script);
+        }
     };
 </script>
 </body>
