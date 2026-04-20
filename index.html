@@ -35,7 +35,7 @@
     } 
 }
         
-        header { background: linear-gradient(135deg, #1e3c72 0%, #1a1f36 100%); color: white; padding: 15px 10px; text-align: center; border-bottom: 3px solid #30D5C8; }
+        header { background: linear-gradient(135deg, #1e3c72 0%, #1a1f36 100%); color: white; padding: 8px 10px; text-align: center; border-bottom: 3px solid #30D5C8; }
         header img { width: 70px; height: 70px; border-radius: 50%; border: 3px solid white; object-fit: cover; display: block; margin: 0 auto 8px; }
         #messages { flex: 1; overflow-y: auto; padding: 20px; background: #ffffff; }
         .text { padding: 12px 16px; border-radius: 18px; font-size: 15px; margin-bottom: 5px; max-width: 85%; line-height: 1.4; }
@@ -131,8 +131,15 @@
         if (!userStoredName) {
             userStoredName = text;
             localStorage.setItem('hugoBot_userName', text);
+
+            // FLUJO NORMAL
+            const triggerInternos = ['welcome_saludo', 'menu_principal'];
+            if (!triggerInternos.includes(text)) {
+                addMessage('Tú', text);
+            }
+            if (isManual) inputEl.value = '';
             addMessage('Tú', text);
-            inputEl.value = '';
+            if (isManual) inputEl.value = '';
             inputEl.placeholder = "Escribe aquí...";
             
             const script = document.createElement('script');
