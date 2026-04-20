@@ -61,27 +61,30 @@
     // Recuperamos el nombre si ya existe en el navegador
     let userStoredName = localStorage.getItem('hugoBot_userName');
 
-    function addMessage(sender, data) {
-        const div = document.getElementById('messages');
-        const isBot = sender === 'Bot';
-        let html = `<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ${isBot ? 'flex-start' : 'flex-end'};">`;
-        html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
-        html += `<div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
+  function addMessage(sender, data) {
+    const div = document.getElementById('messages');
+    const isBot = sender === 'Bot';
+    let html = `<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ${isBot ? 'flex-start' : 'flex-end'};">`;
+    html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
 
-        if (isBot) {
-            if (data.image_url) {
-                let optimizedUrl = data.image_url.replace('/upload/', '/upload/w_500,q_auto,f_auto/');
-                html += `<img src="${optimizedUrl}" style="width:100%; border-radius:10px; margin-bottom:10px; display:block;">`;
-            }
-            let content = data.content || '';
-            html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        } else {
-            html += data;
-        }
-        html += '</div></div>';
-        div.innerHTML += html;
-        div.scrollTop = div.scrollHeight;
+    // ✅ La imagen va FUERA del bubble, a ancho completo
+    if (isBot && data.image_url) {
+        let optimizedUrl = data.image_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
+        html += `<img src="${optimizedUrl}" style="width:100%; max-width:100%; border-radius:12px; margin-bottom:8px; display:block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">`;
     }
+
+    html += `<div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
+    if (isBot) {
+        let content = data.content || '';
+        html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    } else {
+        html += data;
+    }
+    html += '</div></div>';
+
+    div.innerHTML += html;
+    div.scrollTop = div.scrollHeight;
+}
 
     window.handleServerResponse = function(response) {
         document.getElementById('options-container').innerHTML = '';
