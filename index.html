@@ -87,7 +87,7 @@
 
         if (isBot && data.image_url) {
             let optimizedUrl = data.image_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
-            html += `<img src="${optimizedUrl}" style="width:100%; height:auto; max-height:200px; object-fit:contain; border-radius:12px; margin-bottom:8px; display:block;">`;
+            html += `<img src="${optimizedUrl}" style="width:85%; height:auto; border-radius:12px; margin-bottom:8px; display:block; margin-left:auto; margin-right:auto;">`;
         }
 
         html += `<div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
