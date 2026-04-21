@@ -24,30 +24,27 @@
         .bot-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1767020899/FOTO_LOGIN_PLATAFORMA_ok3et0.avif') center center no-repeat; background-size: cover; filter: blur(6px) brightness(0.6); z-index: 1; transform: scale(1.05); }
         #chat-container { display: flex; flex-direction: column; background: #ffffff; position: fixed; z-index: 1000; top: 0; left: 0; width: 100vw; height: 100vh; }
         @media (min-width: 601px) { 
-    #chat-container { 
-        width: min(680px, 92vw);
-        height: 90vh; 
-        top: 50%; 
-        left: 50%; 
-        transform: translate(-50%, -50%); 
-        border-radius: 20px; 
-        box-shadow: 0 30px 60px rgba(0,0,0,0.7); 
-    } 
-}
-        
+            #chat-container { 
+                width: min(680px, 92vw);
+                height: 90vh; 
+                top: 50%; 
+                left: 50%; 
+                transform: translate(-50%, -50%); 
+                border-radius: 20px; 
+                box-shadow: 0 30px 60px rgba(0,0,0,0.7); 
+            } 
+        }
         header { background: linear-gradient(135deg, #1e3c72 0%, #1a1f36 100%); color: white; padding: 8px 10px; text-align: center; border-bottom: 3px solid #30D5C8; }
-        header img { width: 70px; height: 70px; border-radius: 50%; border: 3px solid white; object-fit: cover; display: block; margin: 0 auto 8px; }
+        header img { width: 55px; height: 55px; border-radius: 50%; border: 3px solid white; object-fit: cover; display: block; margin: 0 auto 6px; }
         #messages { flex: 1; overflow-y: auto; padding: 20px; background: #ffffff; }
         .text { padding: 12px 16px; border-radius: 18px; font-size: 15px; margin-bottom: 5px; max-width: 85%; line-height: 1.4; }
-        .bot-message .text { background: #f1f3f6; color: #333; align-self: flex-start; }
-        .user-message .text { background: #1e3c72; color: white; align-self: flex-end; }
+        .bot-message { background: #f1f3f6; color: #333; align-self: flex-start; }
+        .user-message { background: #1e3c72; color: white; align-self: flex-end; }
         #input-area { display: flex; padding: 15px; border-top: 1px solid #eee; background: white; }
         #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 25px; padding: 12px 20px; font-size: 16px; outline: none; }
         #input-area button { background: #1e3c72; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; margin-left: 10px; cursor: pointer; font-size: 20px; }
         .contact-human-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 15px; background-color: #25D366; color: white; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; }
         .back-to-chat-btn { display: block; width: 100%; margin-top: 10px; padding: 12px; background-color: #f8f9fa; color: #1e3c72; border: 2px solid #1e3c72; border-radius: 25px; font-weight: bold; cursor: pointer; }
-
-        max-height: 320px; object-fit: cover;
     </style>
 </head>
 <body>
@@ -56,7 +53,7 @@
     <main id="chat-container">
         <header>
             <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/v1770301307/HugoBot_xkcs39.png" alt="HugoBOT Logo"> 
-            <div style="font-weight:bold; font-size:1.2em;">HugoBOT - Test de Identidad</div>
+            <div style="font-weight:bold; font-size:1.2em;">HugoBOT</div>
         </header>
 
         <div id="messages" role="log" aria-live="polite"></div>
@@ -68,59 +65,71 @@
         </div>
     </main>
 
+    <!-- Botón de reset solo para testing -->
+    <button onclick="localStorage.clear(); location.reload();" 
+        style="position:fixed; bottom:10px; right:10px; z-index:9999; 
+        background:red; color:white; border:none; border-radius:8px; 
+        padding:6px 12px; font-size:12px; cursor:pointer; opacity:0.6;">
+        🔄 Reset Test
+    </button>
+
 <script>                     
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     
-    // Recuperamos el nombre si ya existe en el navegador
     let userStoredName = localStorage.getItem('hugoBot_userName');
 
-  function addMessage(sender, data) {
-    const div = document.getElementById('messages');
-    const isBot = sender === 'Bot';
-    let html = `<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ${isBot ? 'flex-start' : 'flex-end'};">`;
-    html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
+    // ✅ FIX: llave correctamente cerrada, imagen fuera del bubble
+    function addMessage(sender, data) {
+        const div = document.getElementById('messages');
+        const isBot = sender === 'Bot';
+        let html = `<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ${isBot ? 'flex-start' : 'flex-end'};">`;
+        html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
 
-    // ✅ La imagen va FUERA del bubble, a ancho completo
-    if (isBot && data.image_url) {
-        let optimizedUrl = data.image_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
-      html += `<img src="${optimizedUrl}" style="width:100%; height:auto; border-radius:12px; margin-bottom:8px; display:block;">`;
+        if (isBot && data.image_url) {
+            let optimizedUrl = data.image_url.replace('/upload/', '/upload/w_800,q_auto,f_auto/');
+            html += `<img src="${optimizedUrl}" style="width:100%; height:auto; border-radius:12px; margin-bottom:8px; display:block;">`;
+        }
 
-    html += `<div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
-    if (isBot) {
-        let content = data.content || '';
-        html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    } else {
-        html += data;
+        html += `<div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
+        if (isBot) {
+            let content = data.content || '';
+            html += content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        } else {
+            html += data;
+        }
+        html += '</div></div>';  // ✅ cierre correcto
+
+        div.innerHTML += html;
+        div.scrollTop = div.scrollHeight;
     }
-    html += '</div></div>';
-
-    div.innerHTML += html;
-    div.scrollTop = div.scrollHeight;
-}
 
     window.handleServerResponse = function(response) {
         document.getElementById('options-container').innerHTML = '';
         addMessage('Bot', response);
         
-        // Si la respuesta trae una URL (como la del curso gratis), creamos un botón especial
         if (response.url) {
             createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
         }
-
         if (response.options) updateOptions(response.options);
     };
 
- function createLinkButton(text, url) {
+    function createLinkButton(text, url) {
         const container = document.getElementById('options-container');
         const a = document.createElement('a');
         a.href = url;
-        a.target = "_blank"; // Abre en pestaña nueva
+        a.target = "_blank";
         a.style = "background:#30D5C8; border:none; color:white; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer; text-decoration:none; margin:4px; display:inline-block;";
         a.textContent = text;
         container.appendChild(a);
     }
 
-    
+    // ✅ FIX: handleKeyPress definido
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') sendMessage(null, true);
+    }
+
+    const triggerInternos = ['welcome_saludo', 'menu_principal'];
+
     function sendMessage(msg = null, isManual = false) {
         const inputEl = document.getElementById('input');
         const text = msg || inputEl.value.trim();
@@ -130,16 +139,8 @@
         if (!userStoredName) {
             userStoredName = text;
             localStorage.setItem('hugoBot_userName', text);
-
-            // FLUJO NORMAL
-            const triggerInternos = ['welcome_saludo', 'menu_principal'];
-            if (!triggerInternos.includes(text)) {
-                addMessage('Tú', text);
-            }
+            addMessage('Tú', text);  // ✅ solo una vez, sin duplicado
             if (isManual) inputEl.value = '';
-            addMessage('Tú', text);
-            if (isManual) inputEl.value = '';
-            inputEl.placeholder = "Escribe aquí...";
             
             const script = document.createElement('script');
             script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
@@ -148,8 +149,12 @@
         }
 
         // FLUJO NORMAL
-        addMessage('Tú', text);
+        // ✅ No mostramos triggers internos en el chat
+        if (!triggerInternos.includes(text)) {
+            addMessage('Tú', text);
+        }
         if (isManual) inputEl.value = '';
+
         const script = document.createElement('script');
         script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse&t=${new Date().getTime()}`;
         document.head.appendChild(script);
@@ -158,9 +163,7 @@
     function updateOptions(options) {
         const container = document.getElementById('options-container');
         options.forEach(opt => {
-            // Evitamos crear un botón de texto si es el mismo que el del link
             if (opt.toLowerCase().includes("dar click")) return;
-
             const btn = document.createElement('button');
             btn.style = "background:white; border:2px solid #1e3c72; color:#1e3c72; padding:8px 14px; border-radius:20px; font-weight:bold; cursor:pointer; margin:4px;";
             btn.textContent = opt;
@@ -169,24 +172,17 @@
         });
     }
 
-window.onload = function() {
-    if (!userStoredName) {
-        addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
-    } else {
-        // ✅ Llamamos directo al script sin pasar por sendMessage
-        const script = document.createElement('script');
-        script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
-        document.head.appendChild(script);
-    }
-};
+    window.onload = function() {
+        if (!userStoredName) {
+            addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+        } else {
+            // ✅ Directo al script sin pasar por sendMessage (evita mostrar trigger)
+            const script = document.createElement('script');
+            script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
+            document.head.appendChild(script);
+        }
+    };
 </script>
-
-    <button onclick="localStorage.clear(); location.reload();" 
-  style="position:fixed; bottom:10px; right:10px; z-index:9999; 
-  background:red; color:white; border:none; border-radius:8px; 
-  padding:6px 12px; font-size:12px; cursor:pointer; opacity:0.6;">
-  🔄 Reset Test
-</button>
-    
 </body>
 </html>
+
