@@ -173,15 +173,14 @@
     }
 
     window.onload = function() {
-        if (!userStoredName) {
-            addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
-        } else {
-            // ✅ Directo al script sin pasar por sendMessage (evita mostrar trigger)
-            const script = document.createElement('script');
-            script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
-            document.head.appendChild(script);
-        }
-    };
+    if (!userStoredName) {
+        addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+    } else {
+        const script = document.createElement('script');
+        script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
+        document.head.appendChild(script);
+    }
+};
 </script>
 </body>
 </html>
