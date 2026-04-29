@@ -177,8 +177,18 @@ requestAnimationFrame(() => {
         });
     }
 
-    // Reemplazamos el window.onload por este evento más optimizado
-  window.addEventListener('load', () => {
+    // --- CARGA UNIFICADA Y OPTIMIZADA ---
+    window.addEventListener('load', () => {
+        // 1. ARRANCAR EL BOT (Esto es lo que faltaba)
+        setTimeout(() => {
+            if (!userStoredName) {
+                addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+            } else {
+                sendMessage('welcome_saludo');
+            }
+        }, 100);
+
+        // 2. CARGAR FACEBOOK (Solo una vez y al final)
         setTimeout(() => {
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -190,21 +200,8 @@ requestAnimationFrame(() => {
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '2189151328193841');
             fbq('track', 'PageView');
-        }, 500); // El Pixel carga medio segundo después que el bot
+        }, 800); 
     });
-</script>
-
-<script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '2189151328193841');
-    fbq('track', 'PageView');
 </script>
 </body>
 </html>
