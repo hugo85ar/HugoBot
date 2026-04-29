@@ -9,7 +9,10 @@
     <link rel="preconnect" href="https://res.cloudinary.com">
 
     <style>
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #1a1f36; font-family: sans-serif; }
+        html, body {
+    font-family: 'Inter', sans-serif; /* O la que uses */
+    font-display: swap; /* <--- ESTO ES CLAVE */
+}
         /* Imagen con blur desde servidor para ahorrar CPU */
      .bot-background { 
     position: fixed; 
