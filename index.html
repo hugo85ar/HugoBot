@@ -11,7 +11,18 @@
     <style>
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #1a1f36; font-family: sans-serif; }
         /* Imagen con blur desde servidor para ahorrar CPU */
-        .bot-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://res.cloudinary.com/dlnrsadbc/image/upload/e_blur:1000,q_auto,f_auto/v1767020899/FOTO_LOGIN_PLATAFORMA_ok3et0.avif') center center no-repeat; background-size: cover; z-index: 1; transform: scale(1.02); }
+       .bot-background { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    /* Cambiamos la URL para que en mobile no pese nada */
+    background: url('https://res.cloudinary.com/dlnrsadbc/image/upload/w_800,e_blur:1000,q_auto,f_auto/v1767020899/FOTO_LOGIN_PLATAFORMA_ok3et0.avif') center center no-repeat; 
+    background-size: cover; 
+    z-index: 1; 
+    transform: scale(1.02); 
+}
         #chat-container { display: flex; flex-direction: column; background: #ffffff; position: fixed; z-index: 1000; top: 0; left: 0; width: 100vw; height: 100vh; }
         @media (min-width: 601px) { 
             #chat-container { 
