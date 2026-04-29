@@ -174,13 +174,17 @@
         });
     }
 
-    window.onload = function() {
-        if (!userStoredName) {
-            addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
-        } else {
-            sendMessage('welcome_saludo');
-        }
-    };
+    // Reemplazamos el window.onload por este evento más optimizado
+    window.addEventListener('load', () => {
+        // Le damos 100ms de "aire" al navegador para que termine de renderizar
+        setTimeout(() => {
+            if (!userStoredName) {
+                addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+            } else {
+                sendMessage('welcome_saludo');
+            }
+        }, 100);
+    });
 </script>
 
 <script>
