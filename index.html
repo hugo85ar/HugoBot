@@ -105,7 +105,10 @@
         html += '</div></div>'; 
 
         div.innerHTML += html;
-        div.scrollTop = div.scrollHeight;
+       // Usamos requestAnimationFrame para que el scroll no bloquee el renderizado
+requestAnimationFrame(() => {
+    div.scrollTop = div.scrollHeight;
+});
     }
 
     window.handleServerResponse = function(response) {
