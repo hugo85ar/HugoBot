@@ -76,13 +76,26 @@
     </main>
 
     
-
 <script>                    
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     let userStoredName = localStorage.getItem('hugoBot_userName');
 
+    // 1. DEFINIR FUNCIONES DE RESPUESTA PRIMERO (Para que Google las encuentre)
+    window.handleServerResponse = function(response) {
+        console.log("Respuesta recibida:", response);
+        const optionsContainer = document.getElementById('options-container');
+        if (optionsContainer) optionsContainer.innerHTML = '';
+        
+        addMessage('Bot', response);
+        
+        if (response.url) createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
+        if (response.options) updateOptions(response.options);
+    };
+
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
+        if (!div) return;
+
         const isBot = sender === 'Bot';
         let html = `<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ${isBot ? 'flex-start' : 'flex-end'};">`;
         html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
@@ -102,36 +115,12 @@
         }
         html += '</div></div>'; 
 
-        // MEJORA DE VELOCIDAD
         div.insertAdjacentHTML('beforeend', html);
         
         requestAnimationFrame(() => {
             div.scrollTop = div.scrollHeight;
         });
     }
-
-    window.handleServerResponse = function(response) {
-        document.getElementById('options-container').innerHTML = '';
-        addMessage('Bot', response);
-        if (response.url) createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
-        if (response.options) updateOptions(response.options);
-    };
-
-    function createLinkButton(text, url) {
-        const container = document.getElementById('options-container');
-        const a = document.createElement('a');
-        a.href = url;
-        a.target = "_blank";
-        a.style = "margin:4px; width:auto; padding:10px 20px; background:#30D5C8; color:white; border-radius:20px; text-decoration:none; font-weight:bold;";
-        a.textContent = text;
-        container.appendChild(a);
-    }
-
-    function handleKeyPress(event) {
-        if (event.key === 'Enter') sendMessage(null, true);
-    }
-
-    const triggerInternos = ['welcome_saludo', 'menu_principal'];
 
     function sendMessage(msg = null, isManual = false) {
         const inputEl = document.getElementById('input');
@@ -143,18 +132,30 @@
             localStorage.setItem('hugoBot_userName', text);
             addMessage('Tú', text);
             if (isManual) inputEl.value = '';
+            
             const script = document.createElement('script');
             script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
             document.head.appendChild(script);
             return;
         }
 
+        const triggerInternos = ['welcome_saludo', 'menu_principal'];
         if (!triggerInternos.includes(text)) addMessage('Tú', text);
         if (isManual) inputEl.value = '';
 
         const script = document.createElement('script');
         script.src = `${WEB_APP_URL_BASE}?message=${encodeURIComponent(text)}&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
         document.head.appendChild(script);
+    }
+
+    function createLinkButton(text, url) {
+        const container = document.getElementById('options-container');
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = "_blank";
+        a.style = "margin:4px; width:auto; padding:10px 20px; background:#1e3c72; color:white; border-radius:20px; text-decoration:none; font-weight:bold; display:inline-block;";
+        a.textContent = text;
+        container.appendChild(a);
     }
 
     function updateOptions(options) {
@@ -169,17 +170,20 @@
         });
     }
 
-    // --- CARGA CORREGIDA ---
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') sendMessage(null, true);
+    }
+
+    // --- CARGA FINAL CORREGIDA ---
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. Ejecución del Bot
         if (!userStoredName) {
             addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
         } else {
             addMessage('Bot', {content: '¡Hola de nuevo! Un segundo mientras conecto...'});
-            sendMessage('welcome_saludo');
+            // Pequeño delay de 500ms para asegurar que el DOM está listo antes de la petición
+            setTimeout(() => sendMessage('welcome_saludo'), 500);
         }
 
-        // 2. Facebook Pixel (con retraso de 3 segundos para no molestar)
         setTimeout(() => {
             (function(f,b,e,v,n,t,s){
                 if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -191,8 +195,9 @@
             })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '2189151328193841');
             fbq('track', 'PageView');
-        }, 3000);
+        }, 4000);
     });
 </script>
+    
 </body>
 </html>
