@@ -178,15 +178,39 @@ requestAnimationFrame(() => {
     }
 
     // --- CARGA UNIFICADA Y OPTIMIZADA ---
-    window.addEventListener('load', () => {
-        // 1. ARRANCAR EL BOT (Esto es lo que faltaba)
-        setTimeout(() => {
-            if (!userStoredName) {
-                addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
-            } else {
-                sendMessage('welcome_saludo');
-            }
-        }, 100);
+  // --- CARGA UNIFICADA Y VELOZ ---
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 1. ARRANCAR EL BOT INMEDIATAMENTE
+
+    if (!userStoredName) {
+
+        addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+
+    } else {
+
+        // Mostramos un saludo inmediato para que el usuario no espere en blanco
+
+        addMessage('Bot', {content: '¡Hola de nuevo! Estoy conectando con mis herramientas...'});
+
+        // Llamamos al servidor en segundo plano
+
+        sendMessage('welcome_saludo');
+
+    }
+
+
+
+    // 2. CARGAR FACEBOOK (Mucho más tarde, no tiene prisa)
+
+    setTimeout(() => {
+
+        // ... (aquí va tu código actual de Facebook) ...
+
+    }, 3000); // Dale 3 segundos de ventaja al bot
+
+});
 
         // 2. CARGAR FACEBOOK (Solo una vez y al final)
         setTimeout(() => {
