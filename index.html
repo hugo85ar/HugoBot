@@ -157,18 +157,25 @@
 
     // --- EL CAMBIO CLAVE AQUÍ ---
     // Usamos 'DOMContentLoaded' para ganar 1-2 segundos de ventaja
+    // --- CARGA EQUILIBRADA (PARA VOLVER AL 100) ---
     document.addEventListener('DOMContentLoaded', () => {
+        // 1. Dibujamos la interfaz primero (Prioridad Visual)
         if (!userStoredName) {
             addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
         } else {
-            // 1. Saludamos al instante (0ms de espera)
-            addMessage('Bot', {content: '¡Hola de nuevo! Ya te reconozco. Dame un segundo mientras cargo tus opciones...'});
-            
-            // 2. Disparamos la petición a Google YA MISMO (sin setTimeout)
-            sendMessage('welcome_saludo');
+            addMessage('Bot', {content: '¡Hola de nuevo! Dame un segundo mientras cargo tus opciones...'});
         }
 
-        // Facebook se queda al final con mucho delay para no robar ancho de banda
+        // 2. Esperamos un "respiro" (300ms) para que el celular termine de pintar
+        // Esto evita el bloqueo que te bajó el puntaje a 59
+        setTimeout(() => {
+            if (userStoredName) {
+                sendMessage('welcome_saludo');
+            }
+        }, 300);
+
+        // 3. Facebook Píxel: LO ALEJAMOS MÁS. 
+        // Es lo que más puntos quita en móviles.
         setTimeout(() => {
             (function(f,b,e,v,n,t,s){
                 if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -180,10 +187,10 @@
             })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '2189151328193841');
             fbq('track', 'PageView');
-        }, 5000);
+        }, 6000); // 6 segundos de espera para el Píxel
     });
 
-    function handleKeyPress(event) { if (event.key === 'Enter') sendMessage(null, true); }
+    
 </script>
     
 </body>
