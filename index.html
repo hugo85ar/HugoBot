@@ -79,7 +79,6 @@
 
 <script>                    
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
-    
     let userStoredName = localStorage.getItem('hugoBot_userName');
 
     function addMessage(sender, data) {
@@ -89,7 +88,6 @@
         html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
 
         if (isBot && data.image_url) {
-            // Mejoramos el replace para evitar duplicados de parámetros
             let cleanUrl = data.image_url.split('/upload/')[1];
             let optimizedUrl = `https://res.cloudinary.com/dlnrsadbc/image/upload/w_800,q_auto,f_auto/${cleanUrl}`;
             html += `<img src="${optimizedUrl}" style="width:85%; height:auto; border-radius:12px; margin-bottom:8px; display:block; margin-left:auto; margin-right:auto;">`;
@@ -104,20 +102,18 @@
         }
         html += '</div></div>'; 
 
-        div.innerHTML += html;
-       // Usamos requestAnimationFrame para que el scroll no bloquee el renderizado
-requestAnimationFrame(() => {
-    div.scrollTop = div.scrollHeight;
-});
+        // MEJORA DE VELOCIDAD
+        div.insertAdjacentHTML('beforeend', html);
+        
+        requestAnimationFrame(() => {
+            div.scrollTop = div.scrollHeight;
+        });
     }
 
     window.handleServerResponse = function(response) {
         document.getElementById('options-container').innerHTML = '';
         addMessage('Bot', response);
-        
-        if (response.url) {
-            createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
-        }
+        if (response.url) createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
         if (response.options) updateOptions(response.options);
     };
 
@@ -126,8 +122,7 @@ requestAnimationFrame(() => {
         const a = document.createElement('a');
         a.href = url;
         a.target = "_blank";
-        a.className = "contact-human-btn"; // Usamos la clase CSS
-        a.style = "margin:4px; width:auto; padding:10px 20px;";
+        a.style = "margin:4px; width:auto; padding:10px 20px; background:#30D5C8; color:white; border-radius:20px; text-decoration:none; font-weight:bold;";
         a.textContent = text;
         container.appendChild(a);
     }
@@ -148,16 +143,13 @@ requestAnimationFrame(() => {
             localStorage.setItem('hugoBot_userName', text);
             addMessage('Tú', text);
             if (isManual) inputEl.value = '';
-            
             const script = document.createElement('script');
             script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
             document.head.appendChild(script);
             return;
         }
 
-        if (!triggerInternos.includes(text)) {
-            addMessage('Tú', text);
-        }
+        if (!triggerInternos.includes(text)) addMessage('Tú', text);
         if (isManual) inputEl.value = '';
 
         const script = document.createElement('script');
@@ -177,56 +169,30 @@ requestAnimationFrame(() => {
         });
     }
 
-    // --- CARGA UNIFICADA Y OPTIMIZADA ---
-  // --- CARGA UNIFICADA Y VELOZ ---
+    // --- CARGA CORREGIDA ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Ejecución del Bot
+        if (!userStoredName) {
+            addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+        } else {
+            addMessage('Bot', {content: '¡Hola de nuevo! Un segundo mientras conecto...'});
+            sendMessage('welcome_saludo');
+        }
 
-document.addEventListener('DOMContentLoaded', () => {
-
-    // 1. ARRANCAR EL BOT INMEDIATAMENTE
-
-    if (!userStoredName) {
-
-        addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
-
-    } else {
-
-        // Mostramos un saludo inmediato para que el usuario no espere en blanco
-
-        addMessage('Bot', {content: '¡Hola de nuevo! Estoy conectando con mis herramientas...'});
-
-        // Llamamos al servidor en segundo plano
-
-        sendMessage('welcome_saludo');
-
-    }
-
-
-
-    // 2. CARGAR FACEBOOK (Mucho más tarde, no tiene prisa)
-
-    setTimeout(() => {
-
-        // ... (aquí va tu código actual de Facebook) ...
-
-    }, 3000); // Dale 3 segundos de ventaja al bot
-
-});
-
-        // 2. CARGAR FACEBOOK (Solo una vez y al final)
+        // 2. Facebook Pixel (con retraso de 3 segundos para no molestar)
         setTimeout(() => {
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
+            (function(f,b,e,v,n,t,s){
+                if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)
+            })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '2189151328193841');
             fbq('track', 'PageView');
-        }, 800); 
+        }, 3000);
     });
 </script>
 </body>
 </html>
-
