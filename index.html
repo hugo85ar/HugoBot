@@ -98,19 +98,21 @@
         html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
 
        if (isBot && data.image_url) {
-    // Aplicamos una optimización más agresiva en la URL (ancho 400 y calidad eco)
-    let optimizedUrl = data.image_url.includes('/upload/') 
-        ? data.image_url.replace('/upload/', '/upload/w_400,c_scale,q_auto:eco,f_auto/') 
-        : data.image_url;
+    // 1. Limpiamos cualquier parámetro previo para que no se dupliquen (ej. f_auto,q_auto)
+    // Buscamos la carpeta /upload/ y re-inyectamos nuestros parámetros de rendimiento
+    let optimizedUrl = data.image_url.replace(
+        /\/upload\/(?:[^\/]+\/)?v/, 
+        '/upload/w_400,c_scale,q_auto:eco,f_auto/v'
+    );
 
-    // Agregamos fetchpriority="high" para que el navegador le dé prioridad total
+    // 2. Renderizamos con prioridad máxima
     html += `<img src="${optimizedUrl}" 
                   fetchpriority="high" 
                   loading="eager" 
-                  alt="HugoBOT"
-                  style="width:85%; height:auto; border-radius:12px; margin-bottom:8px; display:block; margin-left:auto; margin-right:auto;">`;
+                  decoding="async"
+                  alt="Asistente HugoBOT"
+                  style="width:85%; height:auto; border-radius:12px; margin-bottom:8px; display:block; margin-left:auto; margin-right:auto; aspect-ratio: 1 / 1; background: #f0f0f0;">`;
 }
-
         html += `<div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
         html += isBot ? (data.content || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') : data;
         html += '</div></div>'; 
