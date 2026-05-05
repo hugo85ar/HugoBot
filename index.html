@@ -129,13 +129,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (!userStoredName) {
-            addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
-        } else {
-            addMessage('Bot', {content: `¡Hola de nuevo, ${userStoredName}! Cargando tus opciones...`});
-            setTimeout(() => sendMessage('welcome_saludo'), 100);
-        }
+    // 1. Lógica de inicio del Bot (Prioridad Alta)
+    if (!userStoredName) {
+        addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
+    } else {
+        // Usamos un delay mínimo para asegurar que el DOM esté listo antes de la primera petición
+        addMessage('Bot', {content: `¡Hola de nuevo, **${userStoredName}**! Cargando tus opciones...`});
+        setTimeout(() => sendMessage('welcome_saludo'), 50);
+    }
 
+    // 2. Carga de Scripts de Terceros (Prioridad Baja / Diferida)
+    // En lugar de un timeout fijo de 6s, usamos 'load' para no interferir con el bot
+    window.addEventListener('load', () => {
         setTimeout(() => {
             (function(f,b,e,v,n,t,s){
                 if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -145,10 +150,12 @@
                 t.src=v;s=b.getElementsByTagName(e)[0];
                 s.parentNode.insertBefore(t,s)
             })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+            
             fbq('init', '2189151328193841');
             fbq('track', 'PageView');
-        }, 6000);
+        }, 2000); // 2 segundos después del load es suficiente para no molestar al bot
     });
+});
     </script>
 </body>
 </html>
