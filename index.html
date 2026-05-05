@@ -2,45 +2,27 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-<title>HugoBOT | MODO TEST LOGS</title>
-<link rel="preload" as="image" href="https://res.cloudinary.com/dlnrsadbc/image/upload/w_400,c_scale,q_auto:eco,f_auto/v1777081959/Gemini_Generated_Image_bmtbzjbmtbzjbmtb_eplqpb.png">
-<link rel="preload" as="image" href="https://res.cloudinary.com/dlnrsadbc/image/upload/w_400,c_scale,q_auto:eco,f_auto/v1777295838/pedir_email_maya_aty26u.png">
-<meta name="description" content="HugoBOT: Optimiza tu negocio con herramientas inteligentes, Google Sheets y Apps Script. Tu asistente experto para emprendedores y freelancers.">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>HugoBOT | MODO TEST LOGS</title>
+    <!-- Precarga solo de elementos críticos fijos -->
+    <link rel="preload" as="image" href="https://res.cloudinary.com/dlnrsadbc/image/upload/w_200,c_scale,q_auto,f_auto/v1777552281/hugo_bot_avatar_clsmds_1_gm0dkz.png">
+    <link rel="preload" as="image" href="https://res.cloudinary.com/dlnrsadbc/image/upload/v1777554523/FOTO_LOGIN_PLATAFORMA_ok3et0_1_prky3q.avif">
     
+    <meta name="description" content="HugoBOT: Optimiza tu negocio con herramientas inteligentes, Google Sheets y Apps Script.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="preconnect" href="https://res.cloudinary.com">
 
     <style>
-        html, body {
-    font-family: 'Inter', sans-serif; /* O la que uses */
-    font-display: swap; /* <--- ESTO ES CLAVE */
-}
-        /* Imagen con blur desde servidor para ahorrar CPU */
-     .bot-background { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1777554523/FOTO_LOGIN_PLATAFORMA_ok3et0_1_prky3q.avif') center center no-repeat; 
-    background-size: cover; 
-    z-index: 1; 
-    transform: scale(1.02); 
-}
-        #chat-container { display: flex; flex-direction: column; background: #ffffff; position: fixed; z-index: 1000; top: 0; left: 0; width: 100vw; height: 100vh; }
+        html, body { font-family: 'Inter', sans-serif; font-display: swap; margin: 0; padding: 0; }
+        .bot-background { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: url('https://res.cloudinary.com/dlnrsadbc/image/upload/v1777554523/FOTO_LOGIN_PLATAFORMA_ok3et0_1_prky3q.avif') center center no-repeat; 
+            background-size: cover; z-index: 1; transform: scale(1.02); 
+        }
+        #chat-container { display: flex; flex-direction: column; background: #ffffff; position: fixed; z-index: 1000; top: 0; left: 0; width: 100vw; height: 100vh; content-visibility: auto; contain-intrinsic-size: 500px; }
         @media (min-width: 601px) { 
-            #chat-container { 
-                width: min(680px, 92vw);
-                height: 90vh; 
-                top: 50%; 
-                left: 50%; 
-                transform: translate(-50%, -50%); 
-                border-radius: 20px; 
-                box-shadow: 0 30px 60px rgba(0,0,0,0.7); 
-            } 
+            #chat-container { width: min(680px, 92vw); height: 90vh; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.7); } 
         }
         header { background: linear-gradient(135deg, #1e3c72 0%, #1a1f36 100%); color: white; padding: 8px 10px; text-align: center; border-bottom: 3px solid #30D5C8; }
-        /* Logo optimizado en tamaño */
         header img { width: 55px; height: 55px; border-radius: 50%; border: 3px solid white; object-fit: cover; display: block; margin: 0 auto 6px; }
         #messages { flex: 1; overflow-y: auto; padding: 20px; background: #ffffff; }
         .text { padding: 12px 16px; border-radius: 18px; font-size: 15px; margin-bottom: 5px; max-width: 85%; line-height: 1.4; }
@@ -49,30 +31,20 @@
         #input-area { display: flex; padding: 15px; border-top: 1px solid #eee; background: white; }
         #input-area input { flex: 1; border: 1px solid #ddd; border-radius: 25px; padding: 12px 20px; font-size: 16px; outline: none; }
         #input-area button { background: #1e3c72; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; margin-left: 10px; cursor: pointer; font-size: 20px; }
-
-        #chat-container {
-    content-visibility: auto;
-    contain-intrinsic-size: 500px; /* Una altura estimada */
-}
     </style>
 </head>
 <body>
     <div class="bot-background"></div>
-
     <main id="chat-container">
-   <header>
-    <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/w_200,c_scale,q_auto,f_auto/v1777552281/hugo_bot_avatar_clsmds_1_gm0dkz.png" 
-         alt="HugoBOT Logo" 
-         width="55" 
-         height="55"
-         fetchpriority="high"> <div style="font-weight:bold; font-size:1.2em;">HugoBOT</div>
-</header>
-
+        <header>
+            <img src="https://res.cloudinary.com/dlnrsadbc/image/upload/w_200,c_scale,q_auto,f_auto/v1777552281/hugo_bot_avatar_clsmds_1_gm0dkz.png" 
+                 alt="HugoBOT Logo" width="55" height="55" fetchpriority="high">
+            <div style="font-weight:bold; font-size:1.2em;">HugoBOT</div>
+        </header>
         <div id="messages" role="log" aria-live="polite"></div>
         <div id="options-container" style="padding:0; min-height:0; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
-        
         <div id="input-area">
-            <input id="input" type="text" placeholder="Escribe aquí..." onkeypress="handleKeyPress(event)">
+            <input id="input" type="text" placeholder="Escribe aquí..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button onclick="sendMessage(null, true)">›</button>
         </div>
     </main>
@@ -81,7 +53,6 @@
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     let userStoredName = localStorage.getItem('hugoBot_userName');
 
-    // 1. Aseguramos que la función de respuesta sea global e inmediata
     window.handleServerResponse = function(response) {
         const optionsContainer = document.getElementById('options-container');
         if (optionsContainer) optionsContainer.innerHTML = '';
@@ -97,22 +68,11 @@
         let html = `<div style="margin-bottom:15px; display:flex; flex-direction:column; align-items: ${isBot ? 'flex-start' : 'flex-end'};">`;
         html += `<div style="font-weight:bold; font-size:0.7em; color:#57606f; margin-bottom:2px;">${sender}</div>`;
 
-       if (isBot && data.image_url) {
-    // 1. Limpiamos cualquier parámetro previo para que no se dupliquen (ej. f_auto,q_auto)
-    // Buscamos la carpeta /upload/ y re-inyectamos nuestros parámetros de rendimiento
-    let optimizedUrl = data.image_url.replace(
-        /\/upload\/(?:[^\/]+\/)?v/, 
-        '/upload/w_400,c_scale,q_auto:eco,f_auto/v'
-    );
-
-    // 2. Renderizamos con prioridad máxima
-    html += `<img src="${optimizedUrl}" 
-                  fetchpriority="high" 
-                  loading="eager" 
-                  decoding="async"
-                  alt="Asistente HugoBOT"
-                  style="width:85%; height:auto; border-radius:12px; margin-bottom:8px; display:block; margin-left:auto; margin-right:auto; aspect-ratio: 1 / 1; background: #f0f0f0;">`;
-}
+        if (isBot && data.image_url) {
+            let optimizedUrl = data.image_url.replace(/\/upload\/(?:[^\/]+\/)?v/, '/upload/w_400,c_scale,q_auto:eco,f_auto/v');
+            html += `<img src="${optimizedUrl}" fetchpriority="high" loading="eager" decoding="async" alt="Asistente" 
+                      style="width:85%; height:auto; border-radius:12px; margin-bottom:8px; display:block; margin-left:auto; margin-right:auto; aspect-ratio: 1/1; background: #f0f0f0;">`;
+        }
         html += `<div class="text ${isBot ? 'bot-message' : 'user-message'}">`;
         html += isBot ? (data.content || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') : data;
         html += '</div></div>'; 
@@ -131,14 +91,15 @@
             localStorage.setItem('hugoBot_userName', text);
             addMessage('Tú', text);
             if (isManual) inputEl.value = '';
+            fetch(`${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`, {mode: 'no-cors'});
+            // Nota: Para JSONP se suele usar inyección de script, pero mantengo tu lógica
             const script = document.createElement('script');
             script.src = `${WEB_APP_URL_BASE}?initial=true&userName=${encodeURIComponent(userStoredName)}&callback=handleServerResponse`;
             document.head.appendChild(script);
             return;
         }
 
-        const triggerInternos = ['welcome_saludo', 'menu_principal'];
-        if (!triggerInternos.includes(text)) addMessage('Tú', text);
+        if (!['welcome_saludo', 'menu_principal'].includes(text)) addMessage('Tú', text);
         if (isManual) inputEl.value = '';
 
         const script = document.createElement('script');
@@ -150,7 +111,8 @@
         const container = document.getElementById('options-container');
         const a = document.createElement('a');
         a.href = url; a.target = "_blank";
-        a.style = "margin:4px; width:auto; padding:10px 20px; background:#1e3c72; color:white; border-radius:20px; text-decoration:none; font-weight:bold; display:inline-block;";
+        a.className = "text"; // Aprovechar estilos base
+        a.style = "margin:4px; padding:10px 20px; background:#1e3c72; color:white; border-radius:20px; text-decoration:none; font-weight:bold; display:inline-block;";
         a.textContent = text;
         container.appendChild(a);
     }
@@ -166,27 +128,14 @@
         });
     }
 
-    // --- EL CAMBIO CLAVE AQUÍ ---
-    // Usamos 'DOMContentLoaded' para ganar 1-2 segundos de ventaja
-    // --- CARGA EQUILIBRADA (PARA VOLVER AL 100) ---
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. Dibujamos la interfaz primero (Prioridad Visual)
         if (!userStoredName) {
             addMessage('Bot', {content: '¡Hola! ✨ Bienvenido a HugoBOT. ¿Cómo es tu nombre para comenzar?'});
         } else {
-            addMessage('Bot', {content: '¡Hola de nuevo! Dame un segundo mientras cargo tus opciones...'});
+            addMessage('Bot', {content: `¡Hola de nuevo, ${userStoredName}! Cargando tus opciones...`});
+            setTimeout(() => sendMessage('welcome_saludo'), 100);
         }
 
-        // 2. Esperamos un "respiro" (300ms) para que el celular termine de pintar
-        // Esto evita el bloqueo que te bajó el puntaje a 59
-        setTimeout(() => {
-            if (userStoredName) {
-                sendMessage('welcome_saludo');
-            }
-        }, 300);
-
-        // 3. Facebook Píxel: LO ALEJAMOS MÁS. 
-        // Es lo que más puntos quita en móviles.
         setTimeout(() => {
             (function(f,b,e,v,n,t,s){
                 if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -198,11 +147,8 @@
             })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '2189151328193841');
             fbq('track', 'PageView');
-        }, 6000); // 6 segundos de espera para el Píxel
+        }, 6000);
     });
-
-    
-</script>
-    
+    </script>
 </body>
 </html>
