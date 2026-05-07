@@ -160,6 +160,25 @@
         }, 2000); // 2 segundos después del load es suficiente para no molestar al bot
     });
 });
+
+
+        function resetHugoBot() {
+    if (confirm("¿Querés borrar tu sesión y empezar como usuario nuevo?")) {
+        // 1. Limpiamos el almacenamiento local y de sesión
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // 2. IMPORTANTE: Eliminamos las cookies (por si acaso guardás algo ahí)
+        document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+
+        // 3. Redirigimos a la URL limpia
+        const urlLimpia = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.location.href = urlLimpia;
+    }
+}
+        
     </script>
 </body>
 </html>
