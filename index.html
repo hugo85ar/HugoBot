@@ -57,14 +57,16 @@
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     let userStoredName = localStorage.getItem('hugoBot_userName');
 
-   window.handleServerResponse = function(response) {
+window.handleServerResponse = function(response) {
     const optionsContainer = document.getElementById('options-container');
     if (optionsContainer) optionsContainer.innerHTML = '';
     
     addMessage('Bot', response);
 
-    // Solo crea el botón si hay URL y NO es el saludo inicial
-    if (response.url && response.trigger !== "welcome_saludo") {
+    // FILTRO DE SEGURIDAD:
+    // Solo crea el botón si la URL contiene "whatsapp.com".
+    // Esto ignora automáticamente las imágenes de Cloudinary o cualquier otro link.
+    if (response.url && response.url.includes('whatsapp.com')) {
         createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
     }
 
