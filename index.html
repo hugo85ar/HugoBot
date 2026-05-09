@@ -57,13 +57,19 @@
     const WEB_APP_URL_BASE = "https://script.google.com/macros/s/AKfycbxD0bY2h58MyCwbvGXjE0NeQ1CCGBu2sbfSz7k1_rapvwXUA7HmLMTxOm1DbkblUNoFEg/exec";
     let userStoredName = localStorage.getItem('hugoBot_userName');
 
-    window.handleServerResponse = function(response) {
-        const optionsContainer = document.getElementById('options-container');
-        if (optionsContainer) optionsContainer.innerHTML = '';
-        addMessage('Bot', response);
-        if (response.url) createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
-        if (response.options) updateOptions(response.options);
-    };
+   window.handleServerResponse = function(response) {
+    const optionsContainer = document.getElementById('options-container');
+    if (optionsContainer) optionsContainer.innerHTML = '';
+    
+    addMessage('Bot', response);
+
+    // Solo crea el botón si hay URL y NO es el saludo inicial
+    if (response.url && response.trigger !== "welcome_saludo") {
+        createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
+    }
+
+    if (response.options) updateOptions(response.options);
+};
 
     function addMessage(sender, data) {
         const div = document.getElementById('messages');
