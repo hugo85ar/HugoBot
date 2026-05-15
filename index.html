@@ -66,9 +66,9 @@ window.handleServerResponse = function(response) {
     // FILTRO DE SEGURIDAD:
     // Solo crea el botón si la URL contiene "whatsapp.com".
     // Esto ignora automáticamente las imágenes de Cloudinary o cualquier otro link.
-    if (response.url && response.url.includes('whatsapp.com')) {
-        createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
-    }
+   if (response.url && (response.url.includes('whatsapp.com') || response.url.includes('github.io'))) {
+    createLinkButton("DAR CLICK AQUÍ 🚀", response.url);
+}
 
     if (response.options) updateOptions(response.options);
 };
